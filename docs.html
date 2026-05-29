@@ -1,0 +1,3893 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AGENT 360 — Design & Technical Documentation</title>
+  <style>
+    :root {
+      --primary: #1a2744;
+      --accent: #3b6ef8;
+      --accent-light: #6b9aff;
+      --gold: #f4a823;
+      --green: #22c55e;
+      --red: #ef4444;
+      --surface: #f8fafd;
+      --card: #ffffff;
+      --border: #e2e8f0;
+      --text: #1e293b;
+      --muted: #64748b;
+      --sidebar-w: 260px;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+      background: var(--surface);
+      color: var(--text);
+      display: flex;
+      min-height: 100vh;
+    }
+
+    /* ── SIDEBAR ─────────────────────────────────────── */
+    .sidebar {
+      width: var(--sidebar-w);
+      background: var(--primary);
+      color: #fff;
+      position: fixed;
+      top: 0; left: 0; bottom: 0;
+      overflow-y: auto;
+      z-index: 100;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .sidebar-logo {
+      padding: 24px 20px 16px;
+      border-bottom: 1px solid rgba(255,255,255,0.1);
+    }
+
+    .sidebar-logo .badge {
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 2px;
+      color: var(--gold);
+      text-transform: uppercase;
+      margin-bottom: 6px;
+    }
+
+    .sidebar-logo h2 {
+      font-size: 20px;
+      font-weight: 800;
+      color: #fff;
+      line-height: 1.2;
+    }
+
+    .sidebar-logo p {
+      font-size: 11px;
+      color: rgba(255,255,255,0.5);
+      margin-top: 4px;
+    }
+
+    .nav-section {
+      padding: 16px 0 8px;
+    }
+
+    .nav-section-label {
+      font-size: 9px;
+      font-weight: 700;
+      letter-spacing: 2px;
+      color: rgba(255,255,255,0.35);
+      text-transform: uppercase;
+      padding: 0 20px 6px;
+    }
+
+    .nav-item {
+      display: block;
+      padding: 9px 20px;
+      font-size: 13px;
+      color: rgba(255,255,255,0.7);
+      text-decoration: none;
+      border-left: 3px solid transparent;
+      transition: all 0.15s;
+    }
+
+    .nav-item:hover, .nav-item.active {
+      background: rgba(255,255,255,0.08);
+      color: #fff;
+      border-left-color: var(--gold);
+    }
+
+    .nav-item span { margin-right: 8px; }
+
+    /* ── MAIN CONTENT ────────────────────────────────── */
+    .main {
+      margin-left: var(--sidebar-w);
+      flex: 1;
+      min-width: 0;
+    }
+
+    /* ── HERO ────────────────────────────────────────── */
+    .hero {
+      background: linear-gradient(135deg, #0f1d3d 0%, #1a2744 50%, #0d2053 100%);
+      color: #fff;
+      padding: 60px 60px 50px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .hero::before {
+      content: '';
+      position: absolute;
+      top: -80px; right: -80px;
+      width: 400px; height: 400px;
+      background: radial-gradient(circle, rgba(59,110,248,0.25) 0%, transparent 70%);
+      border-radius: 50%;
+    }
+
+    .hero::after {
+      content: '';
+      position: absolute;
+      bottom: -60px; left: 30%;
+      width: 300px; height: 300px;
+      background: radial-gradient(circle, rgba(244,168,35,0.12) 0%, transparent 70%);
+      border-radius: 50%;
+    }
+
+    .hero-tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(244,168,35,0.15);
+      border: 1px solid rgba(244,168,35,0.3);
+      color: var(--gold);
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      padding: 6px 14px;
+      border-radius: 20px;
+      margin-bottom: 20px;
+    }
+
+    .hero h1 {
+      font-size: 48px;
+      font-weight: 900;
+      line-height: 1.1;
+      margin-bottom: 16px;
+      position: relative;
+    }
+
+    .hero h1 span { color: var(--gold); }
+
+    .hero-sub {
+      font-size: 16px;
+      color: rgba(255,255,255,0.65);
+      max-width: 560px;
+      line-height: 1.6;
+      margin-bottom: 36px;
+    }
+
+    .hero-stats {
+      display: flex;
+      gap: 36px;
+      flex-wrap: wrap;
+    }
+
+    .hero-stat { text-align: center; }
+
+    .hero-stat .val {
+      font-size: 32px;
+      font-weight: 900;
+      color: var(--gold);
+      display: block;
+    }
+
+    .hero-stat .lbl {
+      font-size: 11px;
+      color: rgba(255,255,255,0.5);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    .hero-version {
+      position: absolute;
+      top: 24px; right: 60px;
+      font-size: 11px;
+      color: rgba(255,255,255,0.35);
+    }
+
+    /* ── CONTENT AREA ────────────────────────────────── */
+    .content { padding: 48px 60px; }
+
+    /* ── SECTION HEADER ──────────────────────────────── */
+    .section {
+      margin-bottom: 64px;
+      scroll-margin-top: 24px;
+    }
+
+    .section-header {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      margin-bottom: 28px;
+      padding-bottom: 14px;
+      border-bottom: 2px solid var(--border);
+    }
+
+    .section-icon {
+      width: 40px; height: 40px;
+      background: linear-gradient(135deg, var(--accent), var(--accent-light));
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+      flex-shrink: 0;
+    }
+
+    .section-header h2 {
+      font-size: 22px;
+      font-weight: 800;
+      color: var(--primary);
+    }
+
+    .section-header .section-num {
+      font-size: 12px;
+      color: var(--muted);
+      font-weight: 500;
+    }
+
+    /* ── CARDS ───────────────────────────────────────── */
+    .card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 24px;
+      margin-bottom: 16px;
+    }
+
+    .card-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 16px;
+    }
+
+    .card-grid-3 {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
+    }
+
+    .card-grid-2 {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 16px;
+    }
+
+    .feature-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 22px;
+      position: relative;
+      overflow: hidden;
+      transition: box-shadow 0.2s, transform 0.2s;
+    }
+
+    .feature-card:hover {
+      box-shadow: 0 8px 32px rgba(59,110,248,0.1);
+      transform: translateY(-2px);
+    }
+
+    .feature-card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 3px;
+      background: linear-gradient(90deg, var(--accent), var(--accent-light));
+    }
+
+    .feature-card.gold::before { background: linear-gradient(90deg, #f4a823, #f9c74f); }
+    .feature-card.green::before { background: linear-gradient(90deg, #22c55e, #4ade80); }
+    .feature-card.red::before { background: linear-gradient(90deg, #ef4444, #f87171); }
+    .feature-card.purple::before { background: linear-gradient(90deg, #8b5cf6, #a78bfa); }
+
+    .feature-icon {
+      font-size: 28px;
+      margin-bottom: 12px;
+      display: block;
+    }
+
+    .feature-card h3 {
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--primary);
+      margin-bottom: 8px;
+    }
+
+    .feature-card p {
+      font-size: 13px;
+      color: var(--muted);
+      line-height: 1.6;
+    }
+
+    .feature-card ul {
+      list-style: none;
+      margin-top: 10px;
+    }
+
+    .feature-card ul li {
+      font-size: 12px;
+      color: var(--muted);
+      padding: 3px 0;
+      padding-left: 16px;
+      position: relative;
+    }
+
+    .feature-card ul li::before {
+      content: '→';
+      position: absolute;
+      left: 0;
+      color: var(--accent);
+      font-size: 11px;
+    }
+
+    /* ── TABLE ───────────────────────────────────────── */
+    .table-wrap {
+      overflow-x: auto;
+      border-radius: 12px;
+      border: 1px solid var(--border);
+      margin-bottom: 24px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+    }
+
+    thead {
+      background: var(--primary);
+      color: #fff;
+    }
+
+    thead th {
+      padding: 12px 16px;
+      text-align: left;
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+      white-space: nowrap;
+    }
+
+    tbody tr:nth-child(even) { background: #f8fafd; }
+
+    tbody td {
+      padding: 11px 16px;
+      border-bottom: 1px solid var(--border);
+      color: var(--text);
+      line-height: 1.4;
+    }
+
+    tbody tr:last-child td { border-bottom: none; }
+
+    .badge-type {
+      display: inline-block;
+      padding: 2px 8px;
+      border-radius: 4px;
+      font-size: 11px;
+      font-weight: 600;
+      font-family: monospace;
+    }
+
+    .badge-pk { background: #fef3c7; color: #92400e; }
+    .badge-fk { background: #dbeafe; color: #1e40af; }
+    .badge-str { background: #f0fdf4; color: #166534; }
+    .badge-int { background: #eff6ff; color: #1d4ed8; }
+    .badge-bool { background: #fdf4ff; color: #7e22ce; }
+    .badge-ts { background: #fff7ed; color: #9a3412; }
+    .badge-dec { background: #f0fdf4; color: #15803d; }
+    .badge-date { background: #fef9c3; color: #854d0e; }
+
+    /* ── WORKFLOW ────────────────────────────────────── */
+    .workflow {
+      display: flex;
+      align-items: flex-start;
+      gap: 0;
+      flex-wrap: wrap;
+      margin: 20px 0;
+    }
+
+    .workflow-step {
+      flex: 1;
+      min-width: 140px;
+      text-align: center;
+      position: relative;
+    }
+
+    .workflow-step:not(:last-child)::after {
+      content: '→';
+      position: absolute;
+      right: -12px;
+      top: 18px;
+      font-size: 18px;
+      color: var(--accent);
+      font-weight: 700;
+    }
+
+    .step-circle {
+      width: 40px; height: 40px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--accent), var(--accent-light));
+      color: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 800;
+      font-size: 15px;
+      margin: 0 auto 10px;
+    }
+
+    .step-title {
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--primary);
+      margin-bottom: 4px;
+    }
+
+    .step-desc {
+      font-size: 11px;
+      color: var(--muted);
+      line-height: 1.4;
+    }
+
+    /* ── ROADMAP ─────────────────────────────────────── */
+    .roadmap {
+      position: relative;
+      padding-left: 32px;
+    }
+
+    .roadmap::before {
+      content: '';
+      position: absolute;
+      left: 10px; top: 0; bottom: 0;
+      width: 2px;
+      background: linear-gradient(180deg, var(--accent), var(--gold));
+    }
+
+    .phase {
+      position: relative;
+      margin-bottom: 32px;
+    }
+
+    .phase::before {
+      content: '';
+      position: absolute;
+      left: -26px;
+      top: 12px;
+      width: 14px; height: 14px;
+      border-radius: 50%;
+      background: var(--card);
+      border: 3px solid var(--accent);
+    }
+
+    .phase.current::before { background: var(--gold); border-color: var(--gold); }
+
+    .phase-header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 12px;
+    }
+
+    .phase-num {
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: var(--accent);
+      background: #eff6ff;
+      padding: 3px 10px;
+      border-radius: 20px;
+    }
+
+    .phase.current .phase-num {
+      color: #92400e;
+      background: #fef3c7;
+    }
+
+    .phase h3 {
+      font-size: 16px;
+      font-weight: 800;
+      color: var(--primary);
+    }
+
+    .phase-duration {
+      margin-left: auto;
+      font-size: 12px;
+      color: var(--muted);
+    }
+
+    .phase-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 18px 20px;
+    }
+
+    .phase-tasks {
+      list-style: none;
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+      gap: 8px;
+    }
+
+    .phase-tasks li {
+      font-size: 13px;
+      color: var(--text);
+      padding: 8px 12px;
+      background: var(--surface);
+      border-radius: 6px;
+      border-left: 3px solid var(--accent);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .phase.current .phase-tasks li { border-left-color: var(--gold); }
+
+    /* ── SCREEN MOCKUPS ──────────────────────────────── */
+    .screen-mock {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      overflow: hidden;
+      margin-bottom: 24px;
+    }
+
+    .screen-header {
+      background: var(--primary);
+      color: #fff;
+      padding: 12px 20px;
+      font-size: 13px;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .screen-dots {
+      display: flex;
+      gap: 5px;
+    }
+
+    .screen-dots span {
+      width: 10px; height: 10px;
+      border-radius: 50%;
+    }
+
+    .screen-dots span:nth-child(1) { background: #ef4444; }
+    .screen-dots span:nth-child(2) { background: #f59e0b; }
+    .screen-dots span:nth-child(3) { background: #22c55e; }
+
+    .screen-body { padding: 20px; }
+
+    .mock-nav {
+      display: flex;
+      gap: 4px;
+      background: var(--surface);
+      padding: 6px;
+      border-radius: 8px;
+      margin-bottom: 16px;
+    }
+
+    .mock-tab {
+      padding: 6px 14px;
+      border-radius: 6px;
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--muted);
+      cursor: default;
+    }
+
+    .mock-tab.active {
+      background: var(--primary);
+      color: #fff;
+    }
+
+    .mock-kpi-row {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+
+    .mock-kpi {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 14px;
+      text-align: center;
+    }
+
+    .mock-kpi .kv {
+      font-size: 22px;
+      font-weight: 800;
+      color: var(--accent);
+      display: block;
+    }
+
+    .mock-kpi .kl {
+      font-size: 10px;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .mock-table-head {
+      display: grid;
+      grid-template-columns: 2fr 1.5fr 1fr 1fr 1fr 1fr;
+      gap: 8px;
+      padding: 8px 12px;
+      background: var(--primary);
+      border-radius: 6px 6px 0 0;
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      color: rgba(255,255,255,0.7);
+    }
+
+    .mock-row {
+      display: grid;
+      grid-template-columns: 2fr 1.5fr 1fr 1fr 1fr 1fr;
+      gap: 8px;
+      padding: 10px 12px;
+      border-bottom: 1px solid var(--border);
+      font-size: 12px;
+      align-items: center;
+    }
+
+    .mock-row:hover { background: var(--surface); }
+
+    .score-dot {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      font-size: 12px;
+      font-weight: 700;
+    }
+
+    .score-dot::before {
+      content: '';
+      width: 8px; height: 8px;
+      border-radius: 50%;
+      background: var(--green);
+      display: inline-block;
+    }
+
+    .score-dot.mid::before { background: var(--gold); }
+    .score-dot.low::before { background: var(--red); }
+
+    .status-chip {
+      display: inline-block;
+      padding: 2px 8px;
+      border-radius: 20px;
+      font-size: 10px;
+      font-weight: 700;
+    }
+
+    .chip-active { background: #dcfce7; color: #166534; }
+    .chip-locked { background: #fef2f2; color: #991b1b; }
+    .chip-pending { background: #fef9c3; color: #854d0e; }
+
+    /* ── RELATIONSHIP DIAGRAM ────────────────────────── */
+    .er-diagram {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 32px;
+      display: flex;
+      gap: 32px;
+      align-items: center;
+      flex-wrap: wrap;
+      justify-content: center;
+      min-height: 200px;
+    }
+
+    .er-entity {
+      background: var(--primary);
+      color: #fff;
+      border-radius: 10px;
+      padding: 16px 20px;
+      min-width: 140px;
+      text-align: center;
+      position: relative;
+    }
+
+    .er-entity h4 {
+      font-size: 13px;
+      font-weight: 800;
+      margin-bottom: 6px;
+    }
+
+    .er-entity .er-fields {
+      font-size: 10px;
+      color: rgba(255,255,255,0.6);
+      line-height: 1.6;
+      text-align: left;
+    }
+
+    .er-center {
+      background: linear-gradient(135deg, var(--accent), var(--accent-light));
+      border-radius: 10px;
+      box-shadow: 0 0 0 6px rgba(59,110,248,0.15);
+    }
+
+    .er-connector {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 11px;
+      color: var(--muted);
+    }
+
+    .er-connector .line {
+      width: 40px;
+      height: 2px;
+      background: var(--border);
+      position: relative;
+    }
+
+    /* ── API SPEC ────────────────────────────────────── */
+    .api-endpoint {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      overflow: hidden;
+      margin-bottom: 12px;
+    }
+
+    .api-header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px 16px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .method-badge {
+      font-size: 11px;
+      font-weight: 800;
+      padding: 3px 10px;
+      border-radius: 4px;
+      font-family: monospace;
+      letter-spacing: 0.5px;
+    }
+
+    .m-get { background: #dcfce7; color: #166534; }
+    .m-post { background: #dbeafe; color: #1e40af; }
+    .m-put { background: #fef9c3; color: #854d0e; }
+    .m-delete { background: #fef2f2; color: #991b1b; }
+
+    .api-path {
+      font-size: 13px;
+      font-family: monospace;
+      color: var(--text);
+      font-weight: 600;
+    }
+
+    .api-desc {
+      font-size: 12px;
+      color: var(--muted);
+      margin-left: auto;
+    }
+
+    .api-body {
+      padding: 12px 16px;
+    }
+
+    .param-list {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+      gap: 6px;
+    }
+
+    .param {
+      font-size: 11px;
+      background: var(--surface);
+      padding: 5px 10px;
+      border-radius: 4px;
+      font-family: monospace;
+      color: var(--text);
+    }
+
+    .param .ptype { color: var(--accent); }
+
+    /* ── PERMISSION MATRIX ───────────────────────────── */
+    .perm-table thead th:first-child { width: 200px; }
+
+    .perm-check {
+      text-align: center;
+      font-size: 14px;
+    }
+
+    .p-yes { color: #22c55e; }
+    .p-no { color: #e2e8f0; }
+    .p-cond { color: var(--gold); }
+
+    /* ── INFOBANNER ──────────────────────────────────── */
+    .info-banner {
+      background: #eff6ff;
+      border-left: 4px solid var(--accent);
+      border-radius: 0 8px 8px 0;
+      padding: 14px 18px;
+      font-size: 13px;
+      color: #1e40af;
+      margin-bottom: 20px;
+      line-height: 1.6;
+    }
+
+    .warn-banner {
+      background: #fff7ed;
+      border-left: 4px solid var(--gold);
+      border-radius: 0 8px 8px 0;
+      padding: 14px 18px;
+      font-size: 13px;
+      color: #92400e;
+      margin-bottom: 20px;
+      line-height: 1.6;
+    }
+
+    /* ── CODE BLOCK ──────────────────────────────────── */
+    pre {
+      background: #0f172a;
+      color: #e2e8f0;
+      border-radius: 8px;
+      padding: 20px;
+      overflow-x: auto;
+      font-size: 12px;
+      line-height: 1.7;
+      font-family: 'Cascadia Code', 'Fira Code', monospace;
+      margin-bottom: 16px;
+    }
+
+    .kw { color: #93c5fd; }
+    .str { color: #86efac; }
+    .cm { color: #64748b; }
+    .fn { color: #fde68a; }
+    .num { color: #f9a8d4; }
+
+    /* ── METRIC PILL ─────────────────────────────────── */
+    .metrics-row {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 16px;
+      margin-bottom: 32px;
+    }
+
+    .metric-pill {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 20px;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .metric-pill::before {
+      content: '';
+      position: absolute;
+      bottom: 0; left: 0; right: 0;
+      height: 3px;
+      background: linear-gradient(90deg, var(--accent), var(--accent-light));
+    }
+
+    .metric-pill .m-val {
+      font-size: 30px;
+      font-weight: 900;
+      color: var(--primary);
+      display: block;
+      line-height: 1;
+      margin-bottom: 6px;
+    }
+
+    .metric-pill .m-lbl {
+      font-size: 11px;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    /* ── FOOTER ──────────────────────────────────────── */
+    .footer {
+      background: var(--primary);
+      color: rgba(255,255,255,0.5);
+      text-align: center;
+      padding: 28px;
+      font-size: 12px;
+      margin-top: 48px;
+    }
+
+    .footer strong { color: var(--gold); }
+
+    /* ── FLOWCHART ───────────────────────────────────── */
+    .fc-wrap {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 32px 24px;
+      margin-bottom: 28px;
+      overflow-x: auto;
+    }
+
+    .fc-title {
+      font-size: 14px;
+      font-weight: 800;
+      color: var(--primary);
+      margin-bottom: 24px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .fc-title .fc-tag {
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      background: #eff6ff;
+      color: var(--accent);
+      padding: 3px 10px;
+      border-radius: 20px;
+    }
+
+    /* ── Nodes ── */
+    .fc-row {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0;
+      margin-bottom: 0;
+      flex-wrap: nowrap;
+      min-width: max-content;
+    }
+
+    .fc-col {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0;
+    }
+
+    .fc-node {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      font-size: 12px;
+      font-weight: 600;
+      line-height: 1.3;
+      min-width: 110px;
+      padding: 10px 14px;
+      border-radius: 8px;
+      position: relative;
+      z-index: 1;
+    }
+
+    .fc-node.start, .fc-node.end {
+      border-radius: 30px;
+      min-width: 90px;
+      font-weight: 700;
+    }
+
+    .fc-node.start {
+      background: var(--primary);
+      color: #fff;
+    }
+
+    .fc-node.end {
+      background: var(--green);
+      color: #fff;
+    }
+
+    .fc-node.end-red {
+      background: var(--red);
+      color: #fff;
+      border-radius: 30px;
+      min-width: 90px;
+      font-weight: 700;
+    }
+
+    .fc-node.process {
+      background: #eff6ff;
+      border: 2px solid var(--accent);
+      color: var(--primary);
+    }
+
+    .fc-node.process-gold {
+      background: #fffbeb;
+      border: 2px solid var(--gold);
+      color: #78350f;
+    }
+
+    .fc-node.process-green {
+      background: #f0fdf4;
+      border: 2px solid var(--green);
+      color: #14532d;
+    }
+
+    .fc-node.process-purple {
+      background: #faf5ff;
+      border: 2px solid #8b5cf6;
+      color: #4c1d95;
+    }
+
+    .fc-node.io {
+      background: #f8fafd;
+      border: 2px solid var(--border);
+      color: var(--muted);
+      border-radius: 4px;
+      font-size: 11px;
+      font-style: italic;
+    }
+
+    /* Diamond decision */
+    .fc-diamond-wrap {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 120px;
+      height: 70px;
+      position: relative;
+    }
+
+    .fc-diamond {
+      width: 90px;
+      height: 56px;
+      background: var(--gold);
+      transform: rotate(45deg);
+      border-radius: 4px;
+      position: absolute;
+    }
+
+    .fc-diamond-label {
+      position: relative;
+      z-index: 2;
+      font-size: 11px;
+      font-weight: 700;
+      color: #78350f;
+      text-align: center;
+      line-height: 1.2;
+      max-width: 76px;
+    }
+
+    .fc-diamond.blue { background: var(--accent); }
+    .fc-diamond-label.blue-lbl { color: #fff; }
+    .fc-diamond.red-d { background: #ef4444; }
+    .fc-diamond-label.red-lbl { color: #fff; }
+
+    /* Arrows */
+    .fc-arrow-right {
+      width: 36px;
+      display: flex;
+      align-items: center;
+      flex-shrink: 0;
+    }
+
+    .fc-arrow-right::after {
+      content: '';
+      display: block;
+      width: 36px;
+      height: 2px;
+      background: var(--muted);
+      position: relative;
+    }
+
+    .fc-arrow-right::before {
+      content: '▶';
+      font-size: 10px;
+      color: var(--muted);
+      margin-left: 24px;
+      position: absolute;
+    }
+
+    .fc-arr-r {
+      display: flex;
+      align-items: center;
+      color: var(--muted);
+      font-size: 18px;
+      padding: 0 4px;
+      flex-shrink: 0;
+    }
+
+    .fc-arr-d {
+      display: flex;
+      justify-content: center;
+      color: var(--muted);
+      font-size: 16px;
+      height: 28px;
+      align-items: center;
+    }
+
+    .fc-arr-label {
+      font-size: 10px;
+      color: var(--muted);
+      text-align: center;
+      font-weight: 600;
+      position: absolute;
+    }
+
+    .fc-arr-side {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+    }
+
+    .fc-branch {
+      display: flex;
+      align-items: flex-start;
+      justify-content: center;
+      gap: 32px;
+      margin-top: 0;
+    }
+
+    .fc-branch-arm {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .fc-yes-label, .fc-no-label {
+      font-size: 10px;
+      font-weight: 700;
+      padding: 2px 8px;
+      border-radius: 10px;
+      margin-bottom: 4px;
+    }
+
+    .fc-yes-label { background: #dcfce7; color: #166534; }
+    .fc-no-label  { background: #fef2f2; color: #991b1b; }
+
+    /* ── DATA FLOW DIAGRAM ───────────────────────────── */
+    .dfd-wrap {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 32px;
+      margin-bottom: 24px;
+      overflow-x: auto;
+    }
+
+    .dfd-layer {
+      display: flex;
+      align-items: stretch;
+      gap: 0;
+      min-width: 800px;
+    }
+
+    .dfd-tier {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      flex: 1;
+    }
+
+    .dfd-box {
+      background: var(--primary);
+      color: #fff;
+      border-radius: 10px;
+      padding: 12px 16px;
+      text-align: center;
+      width: 100%;
+      max-width: 140px;
+    }
+
+    .dfd-box h4 {
+      font-size: 12px;
+      font-weight: 800;
+      margin-bottom: 4px;
+    }
+
+    .dfd-box p {
+      font-size: 10px;
+      color: rgba(255,255,255,0.6);
+      line-height: 1.4;
+    }
+
+    .dfd-box.accent-box {
+      background: linear-gradient(135deg, var(--accent), var(--accent-light));
+    }
+
+    .dfd-box.gold-box {
+      background: linear-gradient(135deg, #f4a823, #f9c74f);
+      color: var(--primary);
+    }
+
+    .dfd-box.gold-box p { color: rgba(0,0,0,0.5); }
+
+    .dfd-box.green-box {
+      background: linear-gradient(135deg, #22c55e, #4ade80);
+    }
+
+    .dfd-box.red-box {
+      background: linear-gradient(135deg, #ef4444, #f87171);
+    }
+
+    .dfd-box.purple-box {
+      background: linear-gradient(135deg, #8b5cf6, #a78bfa);
+    }
+
+    .dfd-conn {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      width: 60px;
+      flex-shrink: 0;
+      position: relative;
+    }
+
+    .dfd-conn::before {
+      content: '';
+      width: 100%;
+      height: 2px;
+      background: var(--border);
+      display: block;
+    }
+
+    .dfd-conn-label {
+      position: absolute;
+      top: -18px;
+      font-size: 9px;
+      color: var(--muted);
+      text-align: center;
+      white-space: nowrap;
+      font-weight: 600;
+    }
+
+    .dfd-arr {
+      font-size: 16px;
+      color: var(--muted);
+      position: absolute;
+      right: -2px;
+    }
+
+    .dfd-subtitle {
+      font-size: 11px;
+      color: var(--muted);
+      text-align: center;
+      margin-top: 6px;
+    }
+
+    /* ── SCROLL SMOOTH ───────────────────────────────── */
+    html { scroll-behavior: smooth; }
+
+    @media (max-width: 900px) {
+      .sidebar { display: none; }
+      .main { margin-left: 0; }
+      .hero { padding: 36px 24px; }
+      .content { padding: 28px 24px; }
+      .hero h1 { font-size: 32px; }
+      .card-grid-3, .card-grid-2 { grid-template-columns: 1fr; }
+      .metrics-row { grid-template-columns: repeat(2, 1fr); }
+      .mock-kpi-row { grid-template-columns: repeat(2, 1fr); }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ── SIDEBAR ─────────────────────────────────────────── -->
+<nav class="sidebar">
+  <div class="sidebar-logo">
+    <div class="badge">ROSCA Digital · 2026</div>
+    <h2>AGENT 360</h2>
+    <p>Design & Technical Specification</p>
+  </div>
+
+  <div class="nav-section">
+    <div class="nav-section-label">Overview</div>
+    <a class="nav-item active" href="#overview"><span>🎯</span> Module Overview</a>
+    <a class="nav-item" href="#metrics"><span>📊</span> Key Metrics</a>
+    <a class="nav-item" href="#architecture"><span>🏗️</span> Architecture</a>
+  </div>
+
+  <div class="nav-section">
+    <div class="nav-section-label">Data Design</div>
+    <a class="nav-item" href="#data-structure"><span>🗄️</span> Data Structure</a>
+    <a class="nav-item" href="#relationships"><span>🔗</span> Relationships</a>
+    <a class="nav-item" href="#migrations"><span>📋</span> Migration Plan</a>
+  </div>
+
+  <div class="nav-section">
+    <div class="nav-section-label">Feature Design</div>
+    <a class="nav-item" href="#features"><span>⚡</span> Feature Set</a>
+    <a class="nav-item" href="#screens"><span>🖥️</span> Screen Designs</a>
+    <a class="nav-item" href="#ledger"><span>📒</span> Ledger Format</a>
+    <a class="nav-item" href="#workflows"><span>🔄</span> Workflows</a>
+    <a class="nav-item" href="#permissions"><span>🔐</span> Permissions</a>
+  </div>
+
+  <div class="nav-section">
+    <div class="nav-section-label">API & Integration</div>
+    <a class="nav-item" href="#api"><span>🔌</span> API Spec</a>
+    <a class="nav-item" href="#scoring"><span>⭐</span> Scoring Engine</a>
+    <a class="nav-item" href="#commission"><span>💰</span> Commission Engine</a>
+  </div>
+
+  <div class="nav-section">
+    <div class="nav-section-label">Diagrams</div>
+    <a class="nav-item" href="#dataflow"><span>🌊</span> System Data Flow</a>
+    <a class="nav-item" href="#flowcharts"><span>📐</span> Flowcharts</a>
+  </div>
+
+  <div class="nav-section">
+    <div class="nav-section-label">Implementation</div>
+    <a class="nav-item" href="#roadmap"><span>🗺️</span> Roadmap</a>
+    <a class="nav-item" href="#config"><span>⚙️</span> Configuration</a>
+  </div>
+</nav>
+
+<!-- ── MAIN ────────────────────────────────────────────── -->
+<main class="main">
+
+  <!-- HERO -->
+  <div class="hero">
+    <div class="hero-version">v1.0 · May 2026</div>
+    <div class="hero-tag">⭐ Module Design · ROSCA Digital</div>
+    <h1>AGENT <span>360</span></h1>
+    <p class="hero-sub">
+      A complete 360° view of every field agent — their profile, performance, commission pipeline,
+      introductions, documents, hierarchy, and compliance — built into ROSCA Digital's chit fund platform.
+    </p>
+    <div class="hero-stats">
+      <div class="hero-stat">
+        <span class="val">15</span>
+        <span class="lbl">DB Columns</span>
+      </div>
+      <div class="hero-stat">
+        <span class="val">8</span>
+        <span class="lbl">Core Features</span>
+      </div>
+      <div class="hero-stat">
+        <span class="val">12</span>
+        <span class="lbl">API Endpoints</span>
+      </div>
+      <div class="hero-stat">
+        <span class="val">5</span>
+        <span class="lbl">Phases</span>
+      </div>
+      <div class="hero-stat">
+        <span class="val">6</span>
+        <span class="lbl">Role Levels</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- CONTENT -->
+  <div class="content">
+
+    <!-- ── 1. MODULE OVERVIEW ───────────────────────── -->
+    <section class="section" id="overview">
+      <div class="section-header">
+        <div class="section-icon">🎯</div>
+        <div>
+          <div class="section-num">Section 01</div>
+          <h2>Module Overview</h2>
+        </div>
+      </div>
+
+      <div class="info-banner">
+        <strong>What is AGENT 360?</strong><br>
+        AGENT 360 is the unified agent management module for ROSCA Digital. It gives branch managers, cluster admins,
+        and org admins a complete, real-time view of every field agent — covering onboarding, performance scoring,
+        commission tracking, introduction management, document KYC, and compliance locking.
+        Field agents access their own 360 view via the mobile API portal.
+      </div>
+
+      <div class="card-grid-3">
+        <div class="feature-card">
+          <span class="feature-icon">👤</span>
+          <h3>Agent Profile</h3>
+          <p>Full KYC profile with personal info, addresses, identity numbers (PAN, Aadhaar, GST), bank details, and joining history.</p>
+        </div>
+        <div class="feature-card gold">
+          <span class="feature-icon">⭐</span>
+          <h3>Performance Score</h3>
+          <p>Real-time 0–5 score based on introduction count vs. branch-tier targets and average enrollment quality scores.</p>
+        </div>
+        <div class="feature-card green">
+          <span class="feature-icon">💰</span>
+          <h3>Commission Pipeline</h3>
+          <p>Allocation → Disbursement → Refund lifecycle. Full audit trail per introduction with live commission balance.</p>
+        </div>
+        <div class="feature-card">
+          <span class="feature-icon">🤝</span>
+          <h3>Introduction Tracking</h3>
+          <p>All subscriber enrollments introduced by this agent, with group, scheme, prize status, and per-enrollment commission breakdown.</p>
+        </div>
+        <div class="feature-card purple">
+          <span class="feature-icon">🔐</span>
+          <h3>Compliance & Lock</h3>
+          <p>Admins can lock agents for compliance/fraud. Locked agents cannot receive commissions or add documents.</p>
+        </div>
+        <div class="feature-card red">
+          <span class="feature-icon">🔀</span>
+          <h3>Agent Merge</h3>
+          <p>Consolidate duplicate agent records — transfers introductions, documents, and relationships to the primary agent.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── 2. KEY METRICS ───────────────────────────── -->
+    <section class="section" id="metrics">
+      <div class="section-header">
+        <div class="section-icon">📊</div>
+        <div>
+          <div class="section-num">Section 02</div>
+          <h2>Key Metrics</h2>
+        </div>
+      </div>
+
+      <div class="metrics-row">
+        <div class="metric-pill">
+          <span class="m-val">5</span>
+          <span class="m-lbl">Implementation Phases</span>
+        </div>
+        <div class="metric-pill">
+          <span class="m-val">8</span>
+          <span class="m-lbl">UI Screens</span>
+        </div>
+        <div class="metric-pill">
+          <span class="m-val">6</span>
+          <span class="m-lbl">Role Levels</span>
+        </div>
+        <div class="metric-pill">
+          <span class="m-val">3</span>
+          <span class="m-lbl">Score Metrics</span>
+        </div>
+        <div class="metric-pill">
+          <span class="m-val">12</span>
+          <span class="m-lbl">API Endpoints</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── 3. ARCHITECTURE ──────────────────────────── -->
+    <section class="section" id="architecture">
+      <div class="section-header">
+        <div class="section-icon">🏗️</div>
+        <div>
+          <div class="section-num">Section 03</div>
+          <h2>System Architecture</h2>
+        </div>
+      </div>
+
+      <div class="card-grid-2">
+        <div class="card">
+          <h3 style="font-size:14px;font-weight:800;margin-bottom:14px;color:var(--primary)">Backend Stack</h3>
+          <pre style="margin:0;font-size:11px"><span class="cm">// Laravel MVC Pattern</span>
+
+<span class="kw">Model</span>       → Agent.php
+              + Introducer trait
+              + HasUserAccess trait
+              + HasCustomAudits trait
+              + SoftDeletes trait
+
+<span class="kw">Controller</span>  → AgentsController.php (web)
+              → API/V2/AgentController.php
+
+<span class="kw">Policy</span>      → AgentPolicy.php
+              (6 permission levels)
+
+<span class="kw">Resources</span>   → AgentResource.php (API)
+
+<span class="kw">Jobs</span>        → UpdateAgentScoresJob
+              → FixDuplicateAgentCodesJob
+
+<span class="kw">Search</span>      → AgentsIndexConfigurator
+              (Elasticsearch Scout)</pre>
+        </div>
+
+        <div class="card">
+          <h3 style="font-size:14px;font-weight:800;margin-bottom:14px;color:var(--primary)">Data Flow</h3>
+          <pre style="margin:0;font-size:11px"><span class="cm">// Request lifecycle</span>
+
+<span class="kw">Web/Mobile Request</span>
+    ↓
+<span class="fn">Middleware</span> (Auth + Role)
+    ↓
+<span class="fn">AgentPolicy</span> (Permission check)
+    ↓
+<span class="fn">Controller</span> (AgentsController)
+    ↓
+<span class="fn">Agent Model</span> + Traits
+    ↓
+<span class="fn">MySQL</span> (agents table + related)
+    ↓
+<span class="fn">Elasticsearch</span> (search index)
+    ↓
+<span class="fn">Response</span> (Blade / JSON)
+
+<span class="cm">// Events triggered on change:</span>
+<span class="fn">AgentObserver</span> → updateScore()
+<span class="fn">AuditObserver</span> → log to audits table</pre>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── 4. DATA STRUCTURE ─────────────────────────── -->
+    <section class="section" id="data-structure">
+      <div class="section-header">
+        <div class="section-icon">🗄️</div>
+        <div>
+          <div class="section-num">Section 04</div>
+          <h2>Data Structure — agents Table</h2>
+        </div>
+      </div>
+
+      <div class="info-banner">
+        The <strong>agents</strong> table is the central entity. It has grown through 12 migrations from the initial 2019 schema.
+        All related data (enrollments, documents, commissions, user access) is linked via foreign keys or polymorphic relationships.
+      </div>
+
+      <!-- Identity & Core -->
+      <h3 style="font-size:14px;font-weight:800;color:var(--primary);margin-bottom:10px">Identity & Core Fields</h3>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Column</th>
+              <th>Type</th>
+              <th>Nullable</th>
+              <th>Description</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><td><strong>id</strong></td><td><span class="badge-type badge-pk">PK INT</span></td><td>No</td><td>Auto-increment primary key</td></tr>
+            <tr><td><strong>agent_code</strong></td><td><span class="badge-type badge-str">STRING</span></td><td>No</td><td>Auto-generated: <code>{branch_code}-AGT-{n}</code></td></tr>
+            <tr><td><strong>branch_id</strong></td><td><span class="badge-type badge-fk">FK INT</span></td><td>No</td><td>References <code>branches.id</code></td></tr>
+            <tr><td><strong>employee_id</strong></td><td><span class="badge-type badge-fk">FK INT</span></td><td>Yes</td><td>Managing employee — references <code>employees.id</code></td></tr>
+            <tr><td><strong>prefix</strong></td><td><span class="badge-type badge-str">STRING</span></td><td>No</td><td>Mr./Ms./Dr./etc.</td></tr>
+            <tr><td><strong>name</strong></td><td><span class="badge-type badge-str">STRING</span></td><td>No</td><td>Full legal name</td></tr>
+            <tr><td><strong>gender</strong></td><td><span class="badge-type badge-str">STRING</span></td><td>No</td><td>Male / Female / Other</td></tr>
+            <tr><td><strong>dob</strong></td><td><span class="badge-type badge-date">DATE</span></td><td>Yes</td><td>Date of birth</td></tr>
+            <tr><td><strong>date_of_joining</strong></td><td><span class="badge-type badge-date">DATE</span></td><td>Yes</td><td>Agent onboarding date</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Contact -->
+      <h3 style="font-size:14px;font-weight:800;color:var(--primary);margin-bottom:10px">Contact Fields</h3>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr><th>Column</th><th>Type</th><th>Nullable</th><th>Description</th></tr>
+          </thead>
+          <tbody>
+            <tr><td><strong>email</strong></td><td><span class="badge-type badge-str">STRING</span></td><td>Yes</td><td>Agent email — also used for portal login</td></tr>
+            <tr><td><strong>mobile_primary</strong></td><td><span class="badge-type badge-str">STRING</span></td><td>No</td><td>Primary mobile number</td></tr>
+            <tr><td><strong>mobile_alternate</strong></td><td><span class="badge-type badge-str">STRING</span></td><td>Yes</td><td>Secondary mobile number</td></tr>
+            <tr><td><strong>address_present</strong></td><td><span class="badge-type badge-str">TEXT</span></td><td>Yes</td><td>Current residential address</td></tr>
+            <tr><td><strong>city_present / state_present / district_present / pincode_present</strong></td><td><span class="badge-type badge-str">STRING</span></td><td>Yes</td><td>Current address components</td></tr>
+            <tr><td><strong>address_permanent</strong></td><td><span class="badge-type badge-str">TEXT</span></td><td>Yes</td><td>Permanent address</td></tr>
+            <tr><td><strong>city_permanent / state_permanent / district_permanent / pincode_permanent</strong></td><td><span class="badge-type badge-str">STRING</span></td><td>Yes</td><td>Permanent address components</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Identity & KYC -->
+      <h3 style="font-size:14px;font-weight:800;color:var(--primary);margin-bottom:10px">Identity & KYC Fields</h3>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr><th>Column</th><th>Type</th><th>Nullable</th><th>Description</th></tr>
+          </thead>
+          <tbody>
+            <tr><td><strong>pan_no</strong></td><td><span class="badge-type badge-str">STRING</span></td><td>Yes</td><td>PAN card number</td></tr>
+            <tr><td><strong>aadhaar_no</strong></td><td><span class="badge-type badge-str">STRING</span></td><td>Yes</td><td>Aadhaar UID number</td></tr>
+            <tr><td><strong>ration_no</strong></td><td><span class="badge-type badge-str">STRING</span></td><td>Yes</td><td>Ration card number</td></tr>
+            <tr><td><strong>gst_no</strong></td><td><span class="badge-type badge-str">TEXT</span></td><td>Yes</td><td>GST registration number</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Family & Financial -->
+      <h3 style="font-size:14px;font-weight:800;color:var(--primary);margin-bottom:10px">Family & Financial Fields</h3>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr><th>Column</th><th>Type</th><th>Nullable</th><th>Description</th></tr>
+          </thead>
+          <tbody>
+            <tr><td><strong>father_name</strong></td><td><span class="badge-type badge-str">TEXT</span></td><td>Yes</td><td>Father's full name</td></tr>
+            <tr><td><strong>mother_name</strong></td><td><span class="badge-type badge-str">TEXT</span></td><td>Yes</td><td>Mother's full name</td></tr>
+            <tr><td><strong>spouse_name</strong></td><td><span class="badge-type badge-str">TEXT</span></td><td>Yes</td><td>Spouse's full name</td></tr>
+            <tr><td><strong>monthly_income</strong></td><td><span class="badge-type badge-int">UINT</span></td><td>Yes</td><td>Monthly income in INR</td></tr>
+            <tr><td><strong>source_of_income</strong></td><td><span class="badge-type badge-str">TEXT</span></td><td>Yes</td><td>Income source description</td></tr>
+            <tr><td><strong>bank_account_number</strong></td><td><span class="badge-type badge-str">STRING(20)</span></td><td>Yes</td><td>Bank account for commission disbursement</td></tr>
+            <tr><td><strong>bank_account_ifsc</strong></td><td><span class="badge-type badge-str">STRING(20)</span></td><td>Yes</td><td>IFSC code for bank transfers</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Scoring & Status -->
+      <h3 style="font-size:14px;font-weight:800;color:var(--primary);margin-bottom:10px">Scoring & Status Fields</h3>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr><th>Column</th><th>Type</th><th>Default</th><th>Description</th></tr>
+          </thead>
+          <tbody>
+            <tr><td><strong>score</strong></td><td><span class="badge-type badge-dec">FLOAT(4d)</span></td><td>0</td><td>Overall performance score (0–5 scale)</td></tr>
+            <tr><td><strong>introductions_score</strong></td><td><span class="badge-type badge-dec">FLOAT(4d)</span></td><td>0</td><td>Score from introduction activity (6-month rolling)</td></tr>
+            <tr><td><strong>enrollments_score</strong></td><td><span class="badge-type badge-dec">FLOAT(4d)</span></td><td>0</td><td>Average quality score of introduced enrollments</td></tr>
+            <tr><td><strong>is_locked</strong></td><td><span class="badge-type badge-bool">BOOL</span></td><td>false</td><td>Compliance lock flag</td></tr>
+            <tr><td><strong>lock_message</strong></td><td><span class="badge-type badge-str">STRING</span></td><td>null</td><td>Reason for locking</td></tr>
+            <tr><td><strong>deleted_at</strong></td><td><span class="badge-type badge-ts">TIMESTAMP</span></td><td>null</td><td>Soft delete timestamp</td></tr>
+            <tr><td><strong>created_at / updated_at</strong></td><td><span class="badge-type badge-ts">TIMESTAMP</span></td><td>auto</td><td>Laravel timestamps</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- ── 5. RELATIONSHIPS ─────────────────────────── -->
+    <section class="section" id="relationships">
+      <div class="section-header">
+        <div class="section-icon">🔗</div>
+        <div>
+          <div class="section-num">Section 05</div>
+          <h2>Entity Relationships</h2>
+        </div>
+      </div>
+
+      <div class="er-diagram">
+        <div class="er-entity">
+          <h4>Branch</h4>
+          <div class="er-fields">id<br>name<br>code<br>tier (Urban/Rural)</div>
+        </div>
+        <div class="er-connector"><div class="line"></div>1→N<div class="line"></div></div>
+
+        <div class="er-entity er-center">
+          <h4>AGENT</h4>
+          <div class="er-fields" style="color:rgba(255,255,255,0.8)">id · agent_code<br>branch_id · employee_id<br>score · is_locked<br>pan · aadhaar · gst</div>
+        </div>
+
+        <div class="er-connector"><div class="line"></div>N→1<div class="line"></div></div>
+        <div class="er-entity">
+          <h4>Employee</h4>
+          <div class="er-fields">id<br>name<br>role</div>
+        </div>
+      </div>
+
+      <div style="margin-top:20px" class="card-grid-2">
+        <div class="card">
+          <h3 style="font-size:14px;font-weight:800;color:var(--primary);margin-bottom:14px">Outgoing (Agent → Others)</h3>
+          <div class="table-wrap" style="margin:0">
+            <table>
+              <thead><tr><th>Relationship</th><th>Type</th><th>Target</th></tr></thead>
+              <tbody>
+                <tr><td><code>branch()</code></td><td>belongsTo</td><td>Branch</td></tr>
+                <tr><td><code>employee()</code></td><td>belongsTo</td><td>Employee (supervisor)</td></tr>
+                <tr><td><code>introductions()</code></td><td>morphMany</td><td>Enrollment (introducer)</td></tr>
+                <tr><td><code>documents()</code></td><td>morphMany</td><td>Document (entity)</td></tr>
+                <tr><td><code>user()</code></td><td>morphOne</td><td>User (portal access)</td></tr>
+                <tr><td><code>relationships()</code></td><td>morphMany</td><td>Relationship (entity)</td></tr>
+                <tr><td><code>audits()</code></td><td>morphMany</td><td>Audit (change logs)</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+        <div class="card">
+          <h3 style="font-size:14px;font-weight:800;color:var(--primary);margin-bottom:14px">Incoming (Others → Agent)</h3>
+          <div class="table-wrap" style="margin:0">
+            <table>
+              <thead><tr><th>Source Model</th><th>Relationship</th><th>Condition</th></tr></thead>
+              <tbody>
+                <tr><td>Branch</td><td>hasMany(Agent)</td><td><code>branch_id</code></td></tr>
+                <tr><td>Employee</td><td>hasMany(Agent)</td><td><code>employee_id</code></td></tr>
+                <tr><td>Enrollment</td><td>belongsTo(Agent)</td><td><code>introducer_type = 'App\Agent'</code></td></tr>
+                <tr><td>User</td><td>belongsTo(Agent)</td><td><code>person_type = 'App\Agent'</code></td></tr>
+                <tr><td>Transaction</td><td>belongsTo(Agent)</td><td>Commission transactions</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── 6. MIGRATION PLAN ─────────────────────────── -->
+    <section class="section" id="migrations">
+      <div class="section-header">
+        <div class="section-icon">📋</div>
+        <div>
+          <div class="section-num">Section 06</div>
+          <h2>Migration History & Plan</h2>
+        </div>
+      </div>
+
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr><th>Migration File</th><th>Date</th><th>Columns Added</th><th>Purpose</th></tr>
+          </thead>
+          <tbody>
+            <tr><td><code>create_agents_table</code></td><td>2019-01-04</td><td>Core columns (14)</td><td>Initial agent schema — identity, contact, addresses</td></tr>
+            <tr><td><code>add_family_info</code></td><td>2019-06-27</td><td>father_name, mother_name, spouse_name, monthly_income, source_of_income</td><td>KYC expansion — family & income</td></tr>
+            <tr><td><code>add_gst_no</code></td><td>2019-07-16</td><td>gst_no</td><td>GST compliance requirement</td></tr>
+            <tr><td><code>add_score</code></td><td>2019-08-20</td><td>score</td><td>Agent performance scoring v1</td></tr>
+            <tr><td><code>add_score_breakdown</code></td><td>2020-05-27</td><td>introductions_score, enrollments_score</td><td>Score granularity — v2</td></tr>
+            <tr><td><code>add_employee_id</code></td><td>2020-05-27</td><td>employee_id</td><td>Hierarchy — agent supervised by employee</td></tr>
+            <tr><td><code>add_bank_details</code></td><td>2021-06-17</td><td>bank_account_number, bank_account_ifsc</td><td>Commission disbursement to bank</td></tr>
+            <tr><td><code>add_soft_deletes</code></td><td>2023-10-06</td><td>deleted_at</td><td>Soft delete / restore capability</td></tr>
+            <tr><td><code>add_date_of_joining</code></td><td>2025-07-03</td><td>date_of_joining</td><td>Track agent onboarding date</td></tr>
+            <tr><td><code>add_lock_fields</code></td><td>2025-08-21</td><td>is_locked, lock_message</td><td>Compliance & fraud lock mechanism</td></tr>
+            <tr style="background:#f0fdf4"><td><code>add_agent_tier</code></td><td>Planned</td><td>agent_tier (Bronze/Silver/Gold)</td><td>Tier classification based on cumulative score</td></tr>
+            <tr style="background:#f0fdf4"><td><code>add_target_fields</code></td><td>Planned</td><td>monthly_target, quarterly_target</td><td>Goal-based performance management</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="warn-banner">
+        <strong>Planned migrations</strong> (highlighted in green) are new additions for AGENT 360. They should be created as separate migration files, not modifications to existing migrations.
+      </div>
+    </section>
+
+    <!-- ── 7. FEATURE SET ───────────────────────────── -->
+    <section class="section" id="features">
+      <div class="section-header">
+        <div class="section-icon">⚡</div>
+        <div>
+          <div class="section-num">Section 07</div>
+          <h2>Feature Set</h2>
+        </div>
+      </div>
+
+      <div class="card-grid">
+
+        <div class="feature-card">
+          <span class="feature-icon">👤</span>
+          <h3>F01 — Agent Onboarding</h3>
+          <p>Create and manage agent profiles with auto-generated codes.</p>
+          <ul>
+            <li>Auto-generate code: <code>{branch}-AGT-{n}</code></li>
+            <li>Full KYC form (identity, address, bank)</li>
+            <li>Assign managing employee</li>
+            <li>Set joining date</li>
+            <li>Provision portal access (optional)</li>
+          </ul>
+        </div>
+
+        <div class="feature-card gold">
+          <span class="feature-icon">⭐</span>
+          <h3>F02 — Performance Scoring</h3>
+          <p>Weighted 0–5 score calculated from introduction and enrollment metrics.</p>
+          <ul>
+            <li>introductions_score (weight: 3) — 6-month rolling</li>
+            <li>enrollments_score (weight: 2) — avg quality</li>
+            <li>Tier targets: Urban 2 / Semi-Urban 1 / Rural 0.5</li>
+            <li>Auto-updated on enrollment changes</li>
+            <li>Batch recalc via UpdateAgentScoresJob</li>
+          </ul>
+        </div>
+
+        <div class="feature-card green">
+          <span class="feature-icon">💰</span>
+          <h3>F03 — Commission Engine</h3>
+          <p>Full lifecycle: allocate → disburse → refund per introduction.</p>
+          <ul>
+            <li>% defined in Group Policy per scheme</li>
+            <li>Allocation on enrollment activation</li>
+            <li>Disbursement to bank account</li>
+            <li>Refund on enrollment removal</li>
+            <li>Blocked if agent is locked</li>
+          </ul>
+        </div>
+
+        <div class="feature-card">
+          <span class="feature-icon">🤝</span>
+          <h3>F04 — Introduction Tracking</h3>
+          <p>See every subscriber enrolled by this agent across all groups.</p>
+          <ul>
+            <li>Per-enrollment commission breakdown</li>
+            <li>Prize status tracking</li>
+            <li>Group + scheme info</li>
+            <li>Pagination, search, sort, filter</li>
+            <li>Export to report</li>
+          </ul>
+        </div>
+
+        <div class="feature-card purple">
+          <span class="feature-icon">📄</span>
+          <h3>F05 — Document Management</h3>
+          <p>Attach, view, and manage KYC documents for each agent.</p>
+          <ul>
+            <li>PAN, Aadhaar, Ration card uploads</li>
+            <li>Document blocked if agent is locked</li>
+            <li>Documents transferred on merge</li>
+            <li>Polymorphic storage (shared infra)</li>
+          </ul>
+        </div>
+
+        <div class="feature-card red">
+          <span class="feature-icon">🔐</span>
+          <h3>F06 — Compliance Lock</h3>
+          <p>Lock/unlock agents for compliance or fraud prevention.</p>
+          <ul>
+            <li>Admin-only action (Cluster Admin+)</li>
+            <li>Lock reason stored with message</li>
+            <li>Blocks commission & documents</li>
+            <li>Audit logged with user + timestamp</li>
+            <li>UI shows lock badge and reason</li>
+          </ul>
+        </div>
+
+        <div class="feature-card">
+          <span class="feature-icon">🔀</span>
+          <h3>F07 — Agent Merge</h3>
+          <p>Consolidate duplicate agents into one canonical record.</p>
+          <ul>
+            <li>Transfer all introductions</li>
+            <li>Transfer all documents</li>
+            <li>Transfer all relationships</li>
+            <li>Recalculate scores post-merge</li>
+            <li>Delete duplicate record</li>
+          </ul>
+        </div>
+
+        <div class="feature-card gold">
+          <span class="feature-icon">📱</span>
+          <h3>F08 — Agent Portal (API)</h3>
+          <p>Mobile / web app for agents to self-serve their 360 view.</p>
+          <ul>
+            <li>View own introduction list</li>
+            <li>Commission balance and history</li>
+            <li>Account & KYC details</li>
+            <li>Filter by status, group, prize</li>
+            <li>Secure JWT + role auth</li>
+          </ul>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ── 8. SCREEN DESIGNS ─────────────────────────── -->
+    <section class="section" id="screens">
+      <div class="section-header">
+        <div class="section-icon">🖥️</div>
+        <div>
+          <div class="section-num">Section 08</div>
+          <h2>Screen Designs</h2>
+        </div>
+      </div>
+
+      <!-- Screen 1: Agent List -->
+      <h3 style="font-size:15px;font-weight:800;color:var(--primary);margin-bottom:12px">Screen 01 — Agent List</h3>
+      <div class="screen-mock">
+        <div class="screen-header">
+          <div class="screen-dots"><span></span><span></span><span></span></div>
+          /branches/{branch}/agents — Agent Management List
+        </div>
+        <div class="screen-body">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
+            <div>
+              <div style="font-size:18px;font-weight:900;color:var(--primary)">Agents</div>
+              <div style="font-size:12px;color:var(--muted)">Chennai South Branch · 48 agents</div>
+            </div>
+            <div style="display:flex;gap:8px">
+              <div style="padding:7px 14px;background:var(--surface);border:1px solid var(--border);border-radius:6px;font-size:12px;color:var(--muted)">🔍 Search agents...</div>
+              <div style="padding:7px 14px;background:var(--primary);color:#fff;border-radius:6px;font-size:12px;font-weight:700">+ New Agent</div>
+            </div>
+          </div>
+          <div class="mock-nav">
+            <div class="mock-tab active">Active (46)</div>
+            <div class="mock-tab">Removed (2)</div>
+            <div class="mock-tab">Locked (3)</div>
+          </div>
+          <div class="mock-table-head">
+            <span>Agent</span><span>Mobile</span><span>Introductions</span><span>Score</span><span>Status</span><span>Actions</span>
+          </div>
+          <div class="mock-row">
+            <span><strong>Ravi Kumar</strong><br><span style="font-size:10px;color:var(--muted)">STB-AGT-001</span></span>
+            <span>98765 43210</span>
+            <span>24</span>
+            <span><span class="score-dot">4.8</span></span>
+            <span><span class="status-chip chip-active">Active</span></span>
+            <span style="color:var(--accent);font-size:12px;cursor:pointer">View →</span>
+          </div>
+          <div class="mock-row">
+            <span><strong>Priya Anand</strong><br><span style="font-size:10px;color:var(--muted)">STB-AGT-002</span></span>
+            <span>87654 32109</span>
+            <span>11</span>
+            <span><span class="score-dot mid">3.2</span></span>
+            <span><span class="status-chip chip-active">Active</span></span>
+            <span style="color:var(--accent);font-size:12px;cursor:pointer">View →</span>
+          </div>
+          <div class="mock-row">
+            <span><strong>Mohan Das</strong><br><span style="font-size:10px;color:var(--muted)">STB-AGT-003</span></span>
+            <span>76543 21098</span>
+            <span>3</span>
+            <span><span class="score-dot low">1.5</span></span>
+            <span><span class="status-chip chip-locked">🔒 Locked</span></span>
+            <span style="color:var(--accent);font-size:12px;cursor:pointer">View →</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Screen 2: Agent 360 View -->
+      <h3 style="font-size:15px;font-weight:800;color:var(--primary);margin-bottom:12px">Screen 02 — Agent 360 Dashboard</h3>
+      <div class="screen-mock">
+        <div class="screen-header">
+          <div class="screen-dots"><span></span><span></span><span></span></div>
+          /branches/{branch}/agents/{agent} — Agent 360 View
+        </div>
+        <div class="screen-body">
+          <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:20px">
+            <div>
+              <div style="font-size:20px;font-weight:900;color:var(--primary)">Ravi Kumar</div>
+              <div style="font-size:12px;color:var(--muted);margin:4px 0">STB-AGT-001 · Chennai South Branch</div>
+              <div><span class="status-chip chip-active">Active</span></div>
+            </div>
+            <div style="display:flex;gap:8px">
+              <div style="padding:7px 14px;border:1px solid var(--border);border-radius:6px;font-size:12px">Edit</div>
+              <div style="padding:7px 14px;border:1px solid var(--border);border-radius:6px;font-size:12px">Merge</div>
+              <div style="padding:7px 14px;background:#fef2f2;color:#991b1b;border-radius:6px;font-size:12px;font-weight:700">Remove</div>
+            </div>
+          </div>
+
+          <div class="mock-kpi-row">
+            <div class="mock-kpi">
+              <span class="kv" style="color:var(--gold)">4.8</span>
+              <span class="kl">Overall Score</span>
+            </div>
+            <div class="mock-kpi">
+              <span class="kv">24</span>
+              <span class="kl">Introductions</span>
+            </div>
+            <div class="mock-kpi">
+              <span class="kv" style="color:var(--green)">₹18,400</span>
+              <span class="kl">Commission Eligible</span>
+            </div>
+            <div class="mock-kpi">
+              <span class="kv" style="color:var(--gold)">₹4,200</span>
+              <span class="kl">Pending Disbursement</span>
+            </div>
+          </div>
+
+          <div class="mock-nav">
+            <div class="mock-tab active">Introductions</div>
+            <div class="mock-tab">Documents</div>
+            <div class="mock-tab">Relationships</div>
+            <div class="mock-tab">Notes</div>
+            <div class="mock-tab">Details</div>
+            <div class="mock-tab">Change Logs</div>
+          </div>
+
+          <div class="mock-table-head" style="grid-template-columns:2fr 1.5fr 1fr 1fr 1.2fr 1.2fr">
+            <span>Subscriber</span><span>Group</span><span>Prize</span><span>Installment</span><span>Commission</span><span>Status</span>
+          </div>
+          <div class="mock-row" style="grid-template-columns:2fr 1.5fr 1fr 1fr 1.2fr 1.2fr">
+            <span><strong>Anitha S.</strong><br><span style="font-size:10px;color:var(--muted)">ENR-00192</span></span>
+            <span>GRP-2024-Q2</span>
+            <span>✅ Yes</span>
+            <span>12</span>
+            <span>₹760</span>
+            <span><span class="status-chip chip-active">Disbursed</span></span>
+          </div>
+          <div class="mock-row" style="grid-template-columns:2fr 1.5fr 1fr 1fr 1.2fr 1.2fr">
+            <span><strong>Ganesh R.</strong><br><span style="font-size:10px;color:var(--muted)">ENR-00211</span></span>
+            <span>GRP-2024-Q3</span>
+            <span>—</span>
+            <span>5</span>
+            <span>₹320</span>
+            <span><span class="status-chip chip-pending">Pending</span></span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── 8b. LEDGER FORMAT ────────────────────────── -->
+    <section class="section" id="ledger">
+      <div class="section-header">
+        <div class="section-icon">📒</div>
+        <div>
+          <div class="section-num">Section 08b</div>
+          <h2>Agent Ledger Format</h2>
+        </div>
+      </div>
+
+      <div class="info-banner">
+        <strong>Agent Ledger</strong> is the detailed multi-tab view shown on every agent's 360 profile page.
+        It is displayed on <em>all sub-pages</em> of the agent — the header KPI band is persistent.
+        The ledger covers: profile header, bank accounts, enrollment details, guarantor details, and commission ledger.
+      </div>
+
+      <!-- ── Screen 03: Agent Profile Header ── -->
+      <h3 style="font-size:15px;font-weight:800;color:var(--primary);margin-bottom:12px">Screen 03 — Agent Profile Header (Persistent across all pages)</h3>
+      <div class="screen-mock">
+        <div class="screen-header">
+          <div class="screen-dots"><span></span><span></span><span></span></div>
+          Employee / Agent Details — sticky header shown on all ledger sub-pages
+        </div>
+        <div class="screen-body">
+
+          <!-- Row 1: Identity fields + Edit button -->
+          <div style="border:1px solid var(--border);border-radius:8px;overflow:hidden;margin-bottom:12px">
+            <div style="background:var(--primary);color:#fff;padding:8px 14px;font-size:12px;font-weight:700;display:flex;justify-content:space-between;align-items:center">
+              Employee / Agent Details
+              <div style="background:rgba(255,255,255,0.15);border:1px solid rgba(255,255,255,0.3);padding:4px 14px;border-radius:4px;font-size:11px;cursor:pointer">Edit</div>
+            </div>
+            <div style="display:grid;grid-template-columns:repeat(4,1fr);border-bottom:1px solid var(--border)">
+              <div style="padding:10px 14px;border-right:1px solid var(--border)">
+                <div style="font-size:10px;color:var(--muted);margin-bottom:3px">Emp ID</div>
+                <div style="font-size:13px;font-weight:700">EMP-00142</div>
+              </div>
+              <div style="padding:10px 14px;border-right:1px solid var(--border)">
+                <div style="font-size:10px;color:var(--muted);margin-bottom:3px">Employee Name</div>
+                <div style="font-size:13px;font-weight:700">Ravi Kumar</div>
+              </div>
+              <div style="padding:10px 14px;border-right:1px solid var(--border)">
+                <div style="font-size:10px;color:var(--muted);margin-bottom:3px">Employee Code</div>
+                <div style="font-size:13px;font-weight:700">STB-AGT-001</div>
+              </div>
+              <div style="padding:10px 14px">
+                <div style="font-size:10px;color:var(--muted);margin-bottom:3px">Branch Name</div>
+                <div style="font-size:13px;font-weight:700">Chennai South</div>
+              </div>
+            </div>
+            <div style="display:grid;grid-template-columns:repeat(4,1fr)">
+              <div style="padding:10px 14px;border-right:1px solid var(--border)">
+                <div style="font-size:10px;color:var(--muted);margin-bottom:3px">Mobile No</div>
+                <div style="font-size:13px">98765 43210</div>
+              </div>
+              <div style="padding:10px 14px;border-right:1px solid var(--border)">
+                <div style="font-size:10px;color:var(--muted);margin-bottom:3px">PAN No</div>
+                <div style="font-size:13px">ABCDE1234F</div>
+              </div>
+              <div style="padding:10px 14px;border-right:1px solid var(--border)">
+                <div style="font-size:10px;color:var(--muted);margin-bottom:3px">WhatsApp No</div>
+                <div style="font-size:13px">98765 43210</div>
+              </div>
+              <div style="padding:10px 14px">
+                <div style="font-size:10px;color:var(--muted);margin-bottom:3px">DOB</div>
+                <div style="font-size:13px">12-Mar-1985</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Row 2: KPI Band -->
+          <div style="border:1px solid var(--border);border-radius:8px;overflow:hidden;margin-bottom:12px">
+            <div style="background:var(--primary);color:#fff;padding:8px 14px;font-size:12px;font-weight:700">
+              Employee / Agent Details
+            </div>
+            <div style="overflow-x:auto">
+              <table style="width:100%;border-collapse:collapse;min-width:800px">
+                <thead style="background:#f8fafd">
+                  <tr>
+                    <th style="padding:8px 12px;font-size:11px;font-weight:700;border:1px solid var(--border);text-align:center;color:var(--primary)">Agent. Score</th>
+                    <th style="padding:8px 12px;font-size:11px;font-weight:700;border:1px solid var(--border);text-align:center;color:var(--primary)">Active Enrollments</th>
+                    <th style="padding:8px 12px;font-size:11px;font-weight:700;border:1px solid var(--border);text-align:center;color:var(--primary)">Removed Enrollments</th>
+                    <th style="padding:8px 12px;font-size:11px;font-weight:700;border:1px solid var(--border);text-align:center;color:var(--primary)">Closed Enrollments</th>
+                    <th style="padding:8px 12px;font-size:11px;font-weight:700;border:1px solid var(--border);text-align:center;color:var(--primary)">Prized</th>
+                    <th style="padding:8px 12px;font-size:11px;font-weight:700;border:1px solid var(--border);text-align:center;color:var(--primary)">Non Prized</th>
+                    <th style="padding:8px 12px;font-size:11px;font-weight:700;border:1px solid var(--border);text-align:center;color:var(--primary)">TBC</th>
+                    <th style="padding:8px 12px;font-size:11px;font-weight:700;border:1px solid var(--border);text-align:center;color:var(--primary)">TBC (abv 60 days)</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td style="padding:10px 12px;border:1px solid var(--border);text-align:center;font-weight:800;font-size:18px;color:var(--gold)">4.5</td>
+                    <td style="padding:10px 12px;border:1px solid var(--border);text-align:center;font-size:12px">
+                      <div style="font-weight:700">₹28,50,000</div>
+                      <div style="color:var(--muted);font-size:10px">(12 Nos)</div>
+                    </td>
+                    <td style="padding:10px 12px;border:1px solid var(--border);text-align:center;font-size:12px">
+                      <div style="font-weight:700">₹5,00,000</div>
+                      <div style="color:var(--muted);font-size:10px">(2 Nos)</div>
+                    </td>
+                    <td style="padding:10px 12px;border:1px solid var(--border);text-align:center;font-size:12px">
+                      <div style="font-weight:700">₹12,50,000</div>
+                      <div style="color:var(--muted);font-size:10px">(5 Nos)</div>
+                    </td>
+                    <td style="padding:10px 12px;border:1px solid var(--border);text-align:center;font-size:12px">
+                      <div style="font-weight:700;color:var(--green)">₹10,00,000</div>
+                      <div style="color:var(--muted);font-size:10px">(4 Nos)</div>
+                    </td>
+                    <td style="padding:10px 12px;border:1px solid var(--border);text-align:center;font-size:12px">
+                      <div style="font-weight:700">₹18,50,000</div>
+                      <div style="color:var(--muted);font-size:10px">(8 Nos)</div>
+                    </td>
+                    <td style="padding:10px 12px;border:1px solid var(--border);text-align:center;font-size:12px">
+                      <div style="font-weight:700;color:var(--gold)">₹23,450</div>
+                      <div style="color:var(--muted);font-size:10px">(2 Nos)</div>
+                    </td>
+                    <td style="padding:10px 12px;border:1px solid var(--border);text-align:center;font-size:12px">
+                      <div style="font-weight:700;color:var(--red)">₹23,450</div>
+                      <div style="color:var(--muted);font-size:10px">(2 Nos)</div>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- Row 3: Own-Active Tkt + Guarantor band -->
+          <div style="border:1px solid var(--border);border-radius:8px;overflow:hidden">
+            <div style="overflow-x:auto">
+              <table style="width:100%;border-collapse:collapse;min-width:900px">
+                <thead style="background:#f0f4ff">
+                  <tr>
+                    <th colspan="4" style="padding:8px 12px;font-size:11px;font-weight:800;border:1px solid var(--border);text-align:center;color:var(--primary);background:#e8eeff">Own — Active Tkt</th>
+                    <th colspan="4" style="padding:8px 12px;font-size:11px;font-weight:800;border:1px solid var(--border);text-align:center;color:var(--primary);background:#e8f5e9">Guarantor — Active Tkt</th>
+                  </tr>
+                  <tr>
+                    <th style="padding:8px 12px;font-size:10px;font-weight:700;border:1px solid var(--border);text-align:center;background:#f0f4ff">Chit Value (Nos)</th>
+                    <th style="padding:8px 12px;font-size:10px;font-weight:700;border:1px solid var(--border);text-align:center;background:#f0f4ff">Prized TBC</th>
+                    <th style="padding:8px 12px;font-size:10px;font-weight:700;border:1px solid var(--border);text-align:center;background:#f0f4ff">Non Prized TBC</th>
+                    <th style="padding:8px 12px;font-size:10px;font-weight:700;border:1px solid var(--border);text-align:center;background:#f0f4ff">FL</th>
+                    <th style="padding:8px 12px;font-size:10px;font-weight:700;border:1px solid var(--border);text-align:center;background:#f0fff4">Chit Value (Nos)</th>
+                    <th style="padding:8px 12px;font-size:10px;font-weight:700;border:1px solid var(--border);text-align:center;background:#f0fff4">Prized TBC</th>
+                    <th style="padding:8px 12px;font-size:10px;font-weight:700;border:1px solid var(--border);text-align:center;background:#f0fff4">Non Prized TBC</th>
+                    <th style="padding:8px 12px;font-size:10px;font-weight:700;border:1px solid var(--border);text-align:center;background:#f0fff4">FL</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td style="padding:10px 12px;border:1px solid var(--border);text-align:center;font-size:12px">₹28,50,000 (12)</td>
+                    <td style="padding:10px 12px;border:1px solid var(--border);text-align:center;font-size:12px">₹23,450 (5)</td>
+                    <td style="padding:10px 12px;border:1px solid var(--border);text-align:center;font-size:12px">₹23,450 (5)</td>
+                    <td style="padding:10px 12px;border:1px solid var(--border);text-align:center;font-size:12px">₹23,450 (5)</td>
+                    <td style="padding:10px 12px;border:1px solid var(--border);text-align:center;font-size:12px">₹15,00,000 (6)</td>
+                    <td style="padding:10px 12px;border:1px solid var(--border);text-align:center;font-size:12px">₹23,450 (5)</td>
+                    <td style="padding:10px 12px;border:1px solid var(--border);text-align:center;font-size:12px">₹23,450 (5)</td>
+                    <td style="padding:10px 12px;border:1px solid var(--border);text-align:center;font-size:12px">₹23,450 (5)</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <div style="font-size:11px;color:var(--green);font-weight:700;margin-top:10px">* Display needed on all pages</div>
+        </div>
+      </div>
+
+      <!-- ── Screen 04: Bank Account Details ── -->
+      <h3 style="font-size:15px;font-weight:800;color:var(--primary);margin:28px 0 12px">Screen 04 — Bank Account Details</h3>
+      <div class="screen-mock">
+        <div class="screen-header">
+          <div class="screen-dots"><span></span><span></span><span></span></div>
+          /agents/{agent}/bank-accounts — Bank Account Details Tab
+        </div>
+        <div class="screen-body">
+          <div style="border:1px solid var(--border);border-radius:8px;overflow:hidden">
+            <div style="background:#fef9e7;padding:8px 14px;font-size:12px;font-weight:700;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid var(--border)">
+              <span style="color:var(--primary)">Bank Account Details</span>
+              <div style="background:var(--primary);color:#fff;padding:5px 14px;border-radius:4px;font-size:11px;font-weight:700;cursor:pointer">+ Add Bank Details</div>
+            </div>
+            <div class="table-wrap" style="margin:0;border:none">
+              <table>
+                <thead>
+                  <tr>
+                    <th>S No</th>
+                    <th>Bank Name</th>
+                    <th>Account No</th>
+                    <th>IFSC Code</th>
+                    <th>Branch</th>
+                    <th>Status</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>1</td>
+                    <td><strong>HDFC</strong></td>
+                    <td>255225678532</td>
+                    <td>HDF0052</td>
+                    <td>Ashok Nagar</td>
+                    <td><span class="status-chip chip-active">Active</span></td>
+                  </tr>
+                  <tr>
+                    <td>2</td>
+                    <td><strong>ICICI</strong></td>
+                    <td>268623652365</td>
+                    <td>ICIC0057</td>
+                    <td>Anna Nagar</td>
+                    <td><span class="status-chip chip-locked">Inactive</span></td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── Screen 05: Enrollment Details Ledger ── -->
+      <h3 style="font-size:15px;font-weight:800;color:var(--primary);margin:28px 0 12px">Screen 05 — Enrollment Details Ledger</h3>
+      <div class="screen-mock">
+        <div class="screen-header">
+          <div class="screen-dots"><span></span><span></span><span></span></div>
+          /agents/{agent}/enrollments — Enrollment Details (LEDGER) Tab
+        </div>
+        <div class="screen-body">
+          <div style="border:1px solid var(--border);border-radius:8px;overflow:hidden">
+            <div style="background:var(--primary);color:#fff;padding:8px 14px;font-size:12px;font-weight:700">
+              Enrollment Details (LEDGER)
+            </div>
+            <div class="table-wrap" style="margin:0;border:none">
+              <table>
+                <thead>
+                  <tr>
+                    <th style="min-width:40px">S NO</th>
+                    <th style="min-width:90px">Enrollment No</th>
+                    <th style="min-width:140px">Enrollment Name</th>
+                    <th style="min-width:120px">Subscriber Name</th>
+                    <th style="min-width:100px">Enrollment Date</th>
+                    <th style="min-width:100px">Enrollment Status</th>
+                    <th style="min-width:90px">Prized Status</th>
+                    <th style="min-width:80px">TBC</th>
+                    <th style="min-width:100px">Avg Days (Coll)</th>
+                    <th style="min-width:110px">Commission Status</th>
+                    <th style="min-width:120px">Commission Pass/Fail</th>
+                    <th style="min-width:130px">Final Distribution Status</th>
+                    <th style="min-width:120px">Mode of Payment</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>1</td>
+                    <td>135376</td>
+                    <td>PRR/25L/4 (25) #3</td>
+                    <td>Ram</td>
+                    <td>2022-05-21</td>
+                    <td><span class="status-chip chip-active">Active</span></td>
+                    <td>—</td>
+                    <td>—</td>
+                    <td>—</td>
+                    <td>Eligible</td>
+                    <td><span style="color:var(--green);font-weight:700">Pass</span></td>
+                    <td><span class="status-chip chip-active">Paid</span></td>
+                    <td>Cash</td>
+                  </tr>
+                  <tr>
+                    <td>2</td>
+                    <td>135377</td>
+                    <td>PRR/25L/4 (25) #4</td>
+                    <td>Leela</td>
+                    <td>2022-05-22</td>
+                    <td><span class="status-chip chip-locked">Removed</span></td>
+                    <td>—</td>
+                    <td>—</td>
+                    <td>—</td>
+                    <td>Eligible</td>
+                    <td><span style="color:var(--green);font-weight:700">Pass</span></td>
+                    <td><span class="status-chip chip-pending">Not Paid</span></td>
+                    <td>—</td>
+                  </tr>
+                  <tr>
+                    <td>3</td>
+                    <td>135378</td>
+                    <td>PRR/25L/4 (25) #5</td>
+                    <td>Rani</td>
+                    <td>2022-05-23</td>
+                    <td><span class="status-chip chip-active">Active</span></td>
+                    <td>—</td>
+                    <td>—</td>
+                    <td>—</td>
+                    <td>Eligible</td>
+                    <td><span style="color:var(--green);font-weight:700">Pass</span></td>
+                    <td><span class="status-chip chip-active">Paid</span></td>
+                    <td>Adjustment</td>
+                  </tr>
+                  <tr>
+                    <td>4</td>
+                    <td>135379</td>
+                    <td>PRR/25L/4 (25) #6</td>
+                    <td>Santhi</td>
+                    <td>2022-05-24</td>
+                    <td><span class="status-chip chip-active">Active</span></td>
+                    <td>—</td>
+                    <td>—</td>
+                    <td>—</td>
+                    <td>Eligible</td>
+                    <td><span style="color:var(--green);font-weight:700">Pass</span></td>
+                    <td><span class="status-chip chip-pending">Not Paid</span></td>
+                    <td>—</td>
+                  </tr>
+                  <tr>
+                    <td>5</td>
+                    <td>135380</td>
+                    <td>PRR/25L/4 (25) #7</td>
+                    <td>Shanmugam</td>
+                    <td>2022-05-25</td>
+                    <td><span class="status-chip chip-active">Active</span></td>
+                    <td>—</td>
+                    <td>—</td>
+                    <td>—</td>
+                    <td>Eligible</td>
+                    <td><span style="color:var(--green);font-weight:700">Pass</span></td>
+                    <td><span class="status-chip chip-active">Paid</span></td>
+                    <td>Cheque</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+          <div style="font-size:11px;color:var(--muted);margin-top:10px">Columns: S NO · Enrollment No · Enrollment Name · Subscriber Name · Enrollment Date · Enrollment Status · Prized Status · TBC · Avg Days (Coll) · Commission Status · Commission Pass/Fail · Final Distribution Status · Mode of Payment</div>
+        </div>
+      </div>
+
+      <!-- ── Screen 06: Guarantor Details ── -->
+      <h3 style="font-size:15px;font-weight:800;color:var(--primary);margin:28px 0 12px">Screen 06 — Guarantor Details</h3>
+      <div class="screen-mock">
+        <div class="screen-header">
+          <div class="screen-dots"><span></span><span></span><span></span></div>
+          /agents/{agent}/guarantors — Guarantor Details Tab
+        </div>
+        <div class="screen-body">
+          <div style="border:1px solid var(--border);border-radius:8px;overflow:hidden">
+            <div style="background:var(--primary);color:#fff;padding:8px 14px;font-size:12px;font-weight:700">
+              Guarantor Details
+            </div>
+            <div class="table-wrap" style="margin:0;border:none">
+              <table>
+                <thead>
+                  <tr>
+                    <th>S NO</th>
+                    <th style="min-width:140px">Enrollment Name</th>
+                    <th style="min-width:120px">Guarantor Name</th>
+                    <th style="min-width:110px">Guarantor Score</th>
+                    <th style="min-width:100px">Group Status</th>
+                    <th>TBC</th>
+                    <th style="min-width:120px">Avg Payment Days</th>
+                    <th style="min-width:100px">Verifications</th>
+                    <th style="min-width:110px">Future Liability</th>
+                    <th style="min-width:120px">Legal Activities</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr><td>1</td><td>PRR/25L/4 (25) #3</td><td>Ram</td><td>—</td><td>Running</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td></tr>
+                  <tr><td>2</td><td>PRR/25L/4 (25) #4</td><td>Leela</td><td>—</td><td><span class="status-chip chip-locked">Closed</span></td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td></tr>
+                  <tr><td>3</td><td>PRR/25L/4 (25) #5</td><td>Rani</td><td>—</td><td>Running</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td></tr>
+                  <tr><td>4</td><td>PRR/25L/4 (25) #6</td><td>Santhi</td><td>—</td><td>Running</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td></tr>
+                  <tr><td>5</td><td>PRR/25L/4 (25) #7</td><td>Shanmugam</td><td>—</td><td>Running</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td></tr>
+                  <tr><td>6</td><td>PRR/25L/4 (25) #8</td><td>Dinesh</td><td>—</td><td>Running</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td></tr>
+                  <tr><td>7</td><td>PRR/25L/4 (25) #9</td><td>Suresh</td><td>—</td><td>Running</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td></tr>
+                  <tr><td>8</td><td>PRR/25L/4 (25) #10</td><td>Mahesh</td><td>—</td><td><span class="status-chip chip-locked">Closed</span></td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── Screen 07: Commission Ledger ── -->
+      <h3 style="font-size:15px;font-weight:800;color:var(--primary);margin:28px 0 12px">Screen 07 — Commission Ledger (DNC Commission View)</h3>
+      <div class="screen-mock">
+        <div class="screen-header">
+          <div class="screen-dots"><span></span><span></span><span></span></div>
+          /agents/{agent}/commission — Commission Ledger Tab
+        </div>
+        <div class="screen-body">
+
+          <!-- Filters Bar -->
+          <div style="background:#fff8f0;border:1px solid #fde8c0;border-radius:8px;padding:14px;margin-bottom:16px">
+            <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+              <div style="font-size:12px;font-weight:800;color:var(--gold);background:#fef3c7;border:1px solid #f59e0b;border-radius:4px;padding:5px 12px">Filters</div>
+              <div style="padding:5px 10px;background:#fff;border:1px solid var(--border);border-radius:4px;font-size:11px;color:var(--muted)">Cluster Name ▾</div>
+              <div style="padding:5px 10px;background:#fff;border:1px solid var(--border);border-radius:4px;font-size:11px;color:var(--muted)">Branch Name ▾</div>
+              <div style="padding:5px 10px;background:#fff;border:1px solid var(--border);border-radius:4px;font-size:11px;color:var(--muted)">Group Name ▾</div>
+              <div style="padding:5px 10px;background:#fff;border:1px solid var(--border);border-radius:4px;font-size:11px;color:var(--muted)">Chit Value ▾</div>
+              <div style="padding:5px 10px;background:#fff;border:1px solid var(--border);border-radius:4px;font-size:11px;color:var(--muted)">Tenure ▾</div>
+              <div style="padding:5px 10px;background:#fff;border:1px solid var(--border);border-radius:4px;font-size:11px;color:var(--muted)">Policy Name ▾</div>
+              <div style="padding:5px 10px;background:#fff;border:1px solid var(--border);border-radius:4px;font-size:11px;color:var(--muted)">1st Auction Date</div>
+              <div style="padding:5px 10px;background:#fff;border:1px solid var(--border);border-radius:4px;font-size:11px;color:var(--muted)">Enrolled between</div>
+              <div style="padding:5px 10px;background:#fff;border:1px solid var(--border);border-radius:4px;font-size:11px;color:var(--muted)">First Auc between</div>
+              <div style="padding:5px 10px;background:#fff;border:1px solid var(--border);border-radius:4px;font-size:11px;color:var(--muted)">Group Started between</div>
+            </div>
+          </div>
+
+          <!-- Group Details Table -->
+          <div style="border:1px solid var(--border);border-radius:8px;overflow:hidden;margin-bottom:12px">
+            <div style="background:var(--primary);color:#fff;padding:8px 14px;font-size:12px;font-weight:700">Group Details</div>
+            <div class="table-wrap" style="margin:0;border:none">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Branch Name</th>
+                    <th>Group Name</th>
+                    <th>Chit Value</th>
+                    <th>Group Count</th>
+                    <th>Removed Count</th>
+                    <th>Comm Eligible</th>
+                    <th>Comm Not Eligible</th>
+                    <th>Total</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>Porur</td>
+                    <td>PRR/25L/4 (25)</td>
+                    <td>₹25,00,000</td>
+                    <td>25</td>
+                    <td>0</td>
+                    <td><div style="font-size:12px">Amount</div><div style="font-size:10px;color:var(--muted)">(Nos)</div></td>
+                    <td><div style="font-size:12px">Amount</div><div style="font-size:10px;color:var(--muted)">(Nos)</div></td>
+                    <td>₹23,450 (5)</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div style="padding:0">
+              <table style="width:100%;border-collapse:collapse;font-size:12px">
+                <thead style="background:#f8fafd">
+                  <tr>
+                    <th style="padding:8px 12px;border:1px solid var(--border);font-size:11px;font-weight:700">Comm Eligible Date</th>
+                    <th style="padding:8px 12px;border:1px solid var(--border);font-size:11px;font-weight:700">Comm Eligible Amount</th>
+                    <th style="padding:8px 12px;border:1px solid var(--border);font-size:11px;font-weight:700">Deduction</th>
+                    <th style="padding:8px 12px;border:1px solid var(--border);font-size:11px;font-weight:700">TDS</th>
+                    <th style="padding:8px 12px;border:1px solid var(--border);font-size:11px;font-weight:700">Final Disb</th>
+                    <th style="padding:8px 12px;border:1px solid var(--border);font-size:11px;font-weight:700">Total Disb Comm</th>
+                    <th style="padding:8px 12px;border:1px solid var(--border);font-size:11px;font-weight:700">Total Undisb Comm</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td style="padding:10px 12px;border:1px solid var(--border);text-align:center">25.3.2024</td>
+                    <td style="padding:10px 12px;border:1px solid var(--border);text-align:center"><div>Amount</div><div style="font-size:10px;color:var(--muted)">(Nos)</div></td>
+                    <td style="padding:10px 12px;border:1px solid var(--border);text-align:center"><div>Amount</div><div style="font-size:10px;color:var(--muted)">(Nos)</div></td>
+                    <td style="padding:10px 12px;border:1px solid var(--border);text-align:center"><div>Amount</div><div style="font-size:10px;color:var(--muted)">(Nos)</div></td>
+                    <td style="padding:10px 12px;border:1px solid var(--border);text-align:center"><div>Amount</div><div style="font-size:10px;color:var(--muted)">(Nos)</div></td>
+                    <td style="padding:10px 12px;border:1px solid var(--border);text-align:center"><div>Amount</div><div style="font-size:10px;color:var(--muted)">(Nos)</div></td>
+                    <td style="padding:10px 12px;border:1px solid var(--border);text-align:center"><div>Amount</div><div style="font-size:10px;color:var(--muted)">(Nos)</div></td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- Enrollment Details inside Commission Ledger -->
+          <div style="border:1px solid var(--border);border-radius:8px;overflow:hidden">
+            <div style="background:var(--primary);color:#fff;padding:8px 14px;font-size:12px;font-weight:700">Enrollment Details</div>
+            <div class="table-wrap" style="margin:0;border:none">
+              <table>
+                <thead>
+                  <tr>
+                    <th>S NO</th>
+                    <th style="min-width:140px">Enrollment Name</th>
+                    <th style="min-width:120px">Subscriber Name</th>
+                    <th style="min-width:110px">Enrollment Date</th>
+                    <th style="min-width:110px">Enrollment Status</th>
+                    <th style="min-width:110px">Commission Status</th>
+                    <th style="min-width:90px">Policy Name</th>
+                    <th style="min-width:140px">Final Distribution Status</th>
+                    <th style="min-width:120px">Mode of Payment</th>
+                    <th style="min-width:110px">Date of Payment</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>1</td>
+                    <td>PRR/25L/4 (25) #1</td>
+                    <td colspan="7" style="text-align:center;color:var(--muted);font-style:italic">DNC CHITS PVT LTD</td>
+                    <td>2024.3.01</td>
+                  </tr>
+                  <tr>
+                    <td>2</td>
+                    <td>PRR/25L/4 (25) #2</td>
+                    <td>Ram</td>
+                    <td>2022-05-21</td>
+                    <td><span class="status-chip chip-active">Active</span></td>
+                    <td>Eligible</td>
+                    <td>4.5</td>
+                    <td><span class="status-chip chip-active">Paid</span></td>
+                    <td>Cash</td>
+                    <td>2024.3.02</td>
+                  </tr>
+                  <tr>
+                    <td>3</td>
+                    <td>PRR/25L/4 (25) #3</td>
+                    <td>Leela</td>
+                    <td>2022-05-22</td>
+                    <td><span class="status-chip chip-active">Active</span></td>
+                    <td>Eligible</td>
+                    <td>4.5</td>
+                    <td><span class="status-chip chip-pending">Not Paid</span></td>
+                    <td>—</td>
+                    <td>2024.3.03</td>
+                  </tr>
+                  <tr>
+                    <td>4</td>
+                    <td>PRR/25L/4 (25) #4</td>
+                    <td>Rani</td>
+                    <td>2022-05-23</td>
+                    <td><span class="status-chip chip-active">Active</span></td>
+                    <td>Eligible</td>
+                    <td>4.5</td>
+                    <td><span class="status-chip chip-active">Paid</span></td>
+                    <td>Adjustment</td>
+                    <td>2024.3.04</td>
+                  </tr>
+                  <tr>
+                    <td>5</td>
+                    <td>PRR/25L/4 (25) #5</td>
+                    <td>Santhi</td>
+                    <td>2022-05-24</td>
+                    <td><span class="status-chip chip-active">Active</span></td>
+                    <td>Eligible</td>
+                    <td>4.5</td>
+                    <td><span class="status-chip chip-pending">Not Paid</span></td>
+                    <td>—</td>
+                    <td>2024.3.05</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+          <div style="font-size:11px;color:var(--muted);margin-top:10px">Columns: S NO · Enrollment Name · Subscriber Name · Enrollment Date · Enrollment Status · Commission Status · Policy Name · Final Distribution Status · Mode of Payment · Date of Payment</div>
+        </div>
+      </div>
+
+      <!-- Ledger Column Spec -->
+      <h3 style="font-size:15px;font-weight:800;color:var(--primary);margin:28px 0 12px">Ledger Column Specifications</h3>
+      <div class="card-grid-2">
+        <div class="card">
+          <h3 style="font-size:14px;font-weight:800;color:var(--primary);margin-bottom:14px">Enrollment Details Ledger — Columns</h3>
+          <div class="table-wrap" style="margin:0">
+            <table>
+              <thead><tr><th>Column</th><th>Source</th><th>Notes</th></tr></thead>
+              <tbody>
+                <tr><td>S NO</td><td>Sequence</td><td>Auto-numbered</td></tr>
+                <tr><td>Enrollment No</td><td>enrollments.id</td><td>Unique enrollment identifier</td></tr>
+                <tr><td>Enrollment Name</td><td>enrollments.name</td><td>e.g. PRR/25L/4 (25) #3</td></tr>
+                <tr><td>Subscriber Name</td><td>subscribers.name</td><td>Current subscriber on the ticket</td></tr>
+                <tr><td>Enrollment Date</td><td>enrollments.enrollment_date</td><td>Date of joining</td></tr>
+                <tr><td>Enrollment Status</td><td>enrollments.status</td><td>Active / Removed / Closed</td></tr>
+                <tr><td>Prized Status</td><td>enrollments.prized</td><td>Yes / No / —</td></tr>
+                <tr><td>TBC</td><td>Calculated</td><td>Total Balance Chit (outstanding)</td></tr>
+                <tr><td>Avg Days (Coll)</td><td>Calculated</td><td>Average days to collect installment</td></tr>
+                <tr><td>Commission Status</td><td>transactions</td><td>Eligible / Not Eligible</td></tr>
+                <tr><td>Commission Pass/Fail</td><td>Eligibility engine</td><td>Pass / Fail based on cluster rules</td></tr>
+                <tr><td>Final Distribution Status</td><td>transactions</td><td>Paid / Not Paid</td></tr>
+                <tr><td>Mode of Payment</td><td>transactions.mode</td><td>Cash / Cheque / Neft / Adjustment</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+        <div class="card">
+          <h3 style="font-size:14px;font-weight:800;color:var(--primary);margin-bottom:14px">Guarantor Details — Columns</h3>
+          <div class="table-wrap" style="margin:0">
+            <table>
+              <thead><tr><th>Column</th><th>Source</th><th>Notes</th></tr></thead>
+              <tbody>
+                <tr><td>S NO</td><td>Sequence</td><td>Auto-numbered</td></tr>
+                <tr><td>Enrollment Name</td><td>enrollments.name</td><td>Group ticket reference</td></tr>
+                <tr><td>Guarantor Name</td><td>guarantors.name</td><td>Person acting as guarantor</td></tr>
+                <tr><td>Guarantor Score</td><td>Calculated</td><td>Risk score (TBD)</td></tr>
+                <tr><td>Group Status</td><td>groups.status</td><td>Running / Closed</td></tr>
+                <tr><td>TBC</td><td>Calculated</td><td>Total Balance Chit for the group</td></tr>
+                <tr><td>Avg Payment Days</td><td>Calculated</td><td>Average days to pay installment</td></tr>
+                <tr><td>Verifications</td><td>documents</td><td>KYC document verification count</td></tr>
+                <tr><td>Future Liability</td><td>Calculated</td><td>Remaining chit obligation</td></tr>
+                <tr><td>Legal Activities</td><td>legal_notices</td><td>Any active legal proceedings</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <div class="card" style="margin-top:16px">
+        <h3 style="font-size:14px;font-weight:800;color:var(--primary);margin-bottom:14px">Commission Ledger — Group-Level Columns</h3>
+        <div class="table-wrap" style="margin:0">
+          <table>
+            <thead><tr><th>Column</th><th>Source</th><th>Notes</th></tr></thead>
+            <tbody>
+              <tr><td>Comm Eligible Date</td><td>eligibility engine</td><td>Date agent became eligible for commission on this group</td></tr>
+              <tr><td>Comm Eligible Amount</td><td>transactions (allocation)</td><td>Total commission allocated — format: Amount (Nos)</td></tr>
+              <tr><td>Deduction</td><td>commission_deductions</td><td>Advance / Vacancy / Other deductions</td></tr>
+              <tr><td>TDS</td><td>Calculated</td><td>Editable TDS % applied on eligible amount</td></tr>
+              <tr><td>Final Disb</td><td>Calculated</td><td>Eligible − Deduction − TDS</td></tr>
+              <tr><td>Total Disb Comm</td><td>transactions (disbursement)</td><td>Total commission actually paid out</td></tr>
+              <tr><td>Total Undisb Comm</td><td>Calculated</td><td>Final Disb − Total Disb Comm (pending payout)</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+    </section>
+
+    <!-- ── 9. WORKFLOWS ──────────────────────────────── -->
+    <section class="section" id="workflows">
+      <div class="section-header">
+        <div class="section-icon">🔄</div>
+        <div>
+          <div class="section-num">Section 09</div>
+          <h2>Business Workflows</h2>
+        </div>
+      </div>
+
+      <!-- Workflow 1 -->
+      <h3 style="font-size:14px;font-weight:800;color:var(--primary);margin-bottom:16px">WF01 — Agent Onboarding</h3>
+      <div class="card" style="padding:28px">
+        <div class="workflow">
+          <div class="workflow-step">
+            <div class="step-circle">1</div>
+            <div class="step-title">Create Record</div>
+            <div class="step-desc">Fill KYC form — identity, contact, bank details</div>
+          </div>
+          <div class="workflow-step">
+            <div class="step-circle">2</div>
+            <div class="step-title">Auto-Code</div>
+            <div class="step-desc">System assigns <code>{branch}-AGT-{n}</code></div>
+          </div>
+          <div class="workflow-step">
+            <div class="step-circle">3</div>
+            <div class="step-title">Assign Branch</div>
+            <div class="step-desc">Link to branch and managing employee</div>
+          </div>
+          <div class="workflow-step">
+            <div class="step-circle">4</div>
+            <div class="step-title">Upload Docs</div>
+            <div class="step-desc">PAN, Aadhaar, bank verification</div>
+          </div>
+          <div class="workflow-step">
+            <div class="step-circle">5</div>
+            <div class="step-title">Portal Access</div>
+            <div class="step-desc">Optionally provision User account for mobile</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Workflow 2 -->
+      <h3 style="font-size:14px;font-weight:800;color:var(--primary);margin:24px 0 16px">WF02 — Commission Lifecycle</h3>
+      <div class="card" style="padding:28px">
+        <div class="workflow">
+          <div class="workflow-step">
+            <div class="step-circle" style="background:linear-gradient(135deg,#22c55e,#4ade80)">1</div>
+            <div class="step-title">Introduction</div>
+            <div class="step-desc">Agent introduces subscriber to group enrollment</div>
+          </div>
+          <div class="workflow-step">
+            <div class="step-circle" style="background:linear-gradient(135deg,#22c55e,#4ade80)">2</div>
+            <div class="step-title">Activation</div>
+            <div class="step-desc">Enrollment goes active → commission allocated</div>
+          </div>
+          <div class="workflow-step">
+            <div class="step-circle" style="background:linear-gradient(135deg,#22c55e,#4ade80)">3</div>
+            <div class="step-title">Pending</div>
+            <div class="step-desc">Commission sits in agent commission account</div>
+          </div>
+          <div class="workflow-step">
+            <div class="step-circle" style="background:linear-gradient(135deg,#22c55e,#4ade80)">4</div>
+            <div class="step-title">Disbursement</div>
+            <div class="step-desc">Transfer to agent's bank (blocked if locked)</div>
+          </div>
+          <div class="workflow-step">
+            <div class="step-circle" style="background:linear-gradient(135deg,#ef4444,#f87171)">R</div>
+            <div class="step-title">Refund (if)</div>
+            <div class="step-desc">If enrollment removed, commission returned</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Workflow 3 -->
+      <h3 style="font-size:14px;font-weight:800;color:var(--primary);margin:24px 0 16px">WF03 — Score Recalculation</h3>
+      <div class="card" style="padding:28px">
+        <div class="workflow">
+          <div class="workflow-step">
+            <div class="step-circle" style="background:linear-gradient(135deg,#f4a823,#f9c74f);color:var(--primary)">1</div>
+            <div class="step-title">Trigger</div>
+            <div class="step-desc">Enrollment status changes (active/removed/prized)</div>
+          </div>
+          <div class="workflow-step">
+            <div class="step-circle" style="background:linear-gradient(135deg,#f4a823,#f9c74f);color:var(--primary)">2</div>
+            <div class="step-title">Introductions</div>
+            <div class="step-desc">Count 6-month introductions vs branch-tier target</div>
+          </div>
+          <div class="workflow-step">
+            <div class="step-circle" style="background:linear-gradient(135deg,#f4a823,#f9c74f);color:var(--primary)">3</div>
+            <div class="step-title">Enrollments</div>
+            <div class="step-desc">Average quality score of all active introductions</div>
+          </div>
+          <div class="workflow-step">
+            <div class="step-circle" style="background:linear-gradient(135deg,#f4a823,#f9c74f);color:var(--primary)">4</div>
+            <div class="step-title">Weighted Calc</div>
+            <div class="step-desc"><code>(enr×2 + intro×3) / 5</code></div>
+          </div>
+          <div class="workflow-step">
+            <div class="step-circle" style="background:linear-gradient(135deg,#f4a823,#f9c74f);color:var(--primary)">5</div>
+            <div class="step-title">Persist</div>
+            <div class="step-desc">Updates score, introductions_score, enrollments_score</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── 10. PERMISSIONS ──────────────────────────── -->
+    <section class="section" id="permissions">
+      <div class="section-header">
+        <div class="section-icon">🔐</div>
+        <div>
+          <div class="section-num">Section 10</div>
+          <h2>Permission Matrix</h2>
+        </div>
+      </div>
+
+      <div class="table-wrap">
+        <table class="perm-table">
+          <thead>
+            <tr>
+              <th>Action</th>
+              <th>Super Admin</th>
+              <th>Org Admin</th>
+              <th>Cluster Admin</th>
+              <th>Branch Head</th>
+              <th>Back Office Exec</th>
+              <th>Agent (Self)</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>View Agent</strong></td>
+              <td class="perm-check"><span class="p-yes">✔</span></td>
+              <td class="perm-check"><span class="p-yes">✔</span></td>
+              <td class="perm-check"><span class="p-yes">✔</span></td>
+              <td class="perm-check"><span class="p-yes">✔</span></td>
+              <td class="perm-check"><span class="p-yes">✔</span></td>
+              <td class="perm-check"><span class="p-yes">✔</span></td>
+            </tr>
+            <tr>
+              <td><strong>Create Agent</strong></td>
+              <td class="perm-check"><span class="p-yes">✔</span></td>
+              <td class="perm-check"><span class="p-yes">✔</span></td>
+              <td class="perm-check"><span class="p-yes">✔</span></td>
+              <td class="perm-check"><span class="p-no">✗</span></td>
+              <td class="perm-check"><span class="p-cond">⚙</span></td>
+              <td class="perm-check"><span class="p-no">✗</span></td>
+            </tr>
+            <tr>
+              <td><strong>Edit Agent</strong></td>
+              <td class="perm-check"><span class="p-yes">✔</span></td>
+              <td class="perm-check"><span class="p-yes">✔</span></td>
+              <td class="perm-check"><span class="p-yes">✔</span></td>
+              <td class="perm-check"><span class="p-no">✗</span></td>
+              <td class="perm-check"><span class="p-cond">⚙</span></td>
+              <td class="perm-check"><span class="p-no">✗</span></td>
+            </tr>
+            <tr>
+              <td><strong>Delete (Soft)</strong></td>
+              <td class="perm-check"><span class="p-yes">✔</span></td>
+              <td class="perm-check"><span class="p-yes">✔</span></td>
+              <td class="perm-check"><span class="p-no">✗</span></td>
+              <td class="perm-check"><span class="p-no">✗</span></td>
+              <td class="perm-check"><span class="p-no">✗</span></td>
+              <td class="perm-check"><span class="p-no">✗</span></td>
+            </tr>
+            <tr>
+              <td><strong>Restore</strong></td>
+              <td class="perm-check"><span class="p-yes">✔</span></td>
+              <td class="perm-check"><span class="p-yes">✔</span></td>
+              <td class="perm-check"><span class="p-no">✗</span></td>
+              <td class="perm-check"><span class="p-no">✗</span></td>
+              <td class="perm-check"><span class="p-no">✗</span></td>
+              <td class="perm-check"><span class="p-no">✗</span></td>
+            </tr>
+            <tr>
+              <td><strong>Force Delete</strong></td>
+              <td class="perm-check"><span class="p-yes">✔</span></td>
+              <td class="perm-check"><span class="p-no">✗</span></td>
+              <td class="perm-check"><span class="p-no">✗</span></td>
+              <td class="perm-check"><span class="p-no">✗</span></td>
+              <td class="perm-check"><span class="p-no">✗</span></td>
+              <td class="perm-check"><span class="p-no">✗</span></td>
+            </tr>
+            <tr>
+              <td><strong>Upload Documents</strong></td>
+              <td class="perm-check"><span class="p-yes">✔</span></td>
+              <td class="perm-check"><span class="p-yes">✔</span></td>
+              <td class="perm-check"><span class="p-yes">✔</span></td>
+              <td class="perm-check"><span class="p-cond">⚙</span></td>
+              <td class="perm-check"><span class="p-cond">⚙</span></td>
+              <td class="perm-check"><span class="p-no">✗</span></td>
+            </tr>
+            <tr>
+              <td><strong>Merge Agent</strong></td>
+              <td class="perm-check"><span class="p-yes">✔</span></td>
+              <td class="perm-check"><span class="p-yes">✔</span></td>
+              <td class="perm-check"><span class="p-yes">✔</span></td>
+              <td class="perm-check"><span class="p-no">✗</span></td>
+              <td class="perm-check"><span class="p-no">✗</span></td>
+              <td class="perm-check"><span class="p-no">✗</span></td>
+            </tr>
+            <tr>
+              <td><strong>Lock / Unlock</strong></td>
+              <td class="perm-check"><span class="p-yes">✔</span></td>
+              <td class="perm-check"><span class="p-no">✗</span></td>
+              <td class="perm-check"><span class="p-yes">✔</span></td>
+              <td class="perm-check"><span class="p-no">✗</span></td>
+              <td class="perm-check"><span class="p-no">✗</span></td>
+              <td class="perm-check"><span class="p-no">✗</span></td>
+            </tr>
+            <tr>
+              <td><strong>View Change Logs</strong></td>
+              <td class="perm-check"><span class="p-yes">✔</span></td>
+              <td class="perm-check"><span class="p-no">✗</span></td>
+              <td class="perm-check"><span class="p-no">✗</span></td>
+              <td class="perm-check"><span class="p-no">✗</span></td>
+              <td class="perm-check"><span class="p-no">✗</span></td>
+              <td class="perm-check"><span class="p-no">✗</span></td>
+            </tr>
+            <tr>
+              <td><strong>API — My Enrollments</strong></td>
+              <td class="perm-check"><span class="p-no">✗</span></td>
+              <td class="perm-check"><span class="p-no">✗</span></td>
+              <td class="perm-check"><span class="p-no">✗</span></td>
+              <td class="perm-check"><span class="p-no">✗</span></td>
+              <td class="perm-check"><span class="p-no">✗</span></td>
+              <td class="perm-check"><span class="p-yes">✔</span></td>
+            </tr>
+            <tr>
+              <td><strong>API — My Account</strong></td>
+              <td class="perm-check"><span class="p-no">✗</span></td>
+              <td class="perm-check"><span class="p-no">✗</span></td>
+              <td class="perm-check"><span class="p-no">✗</span></td>
+              <td class="perm-check"><span class="p-no">✗</span></td>
+              <td class="perm-check"><span class="p-no">✗</span></td>
+              <td class="perm-check"><span class="p-yes">✔</span></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <p style="font-size:12px;color:var(--muted);margin-top:8px">
+        <span style="color:var(--green)">✔</span> Always allowed &nbsp;
+        <span style="color:var(--gold)">⚙</span> Configurable via feature flag &nbsp;
+        <span style="color:var(--border);font-weight:900">✗</span> Denied &nbsp;
+        Note: Document creation is additionally blocked if <code>is_locked = true</code>.
+      </p>
+    </section>
+
+    <!-- ── 11. API SPEC ──────────────────────────────── -->
+    <section class="section" id="api">
+      <div class="section-header">
+        <div class="section-icon">🔌</div>
+        <div>
+          <div class="section-num">Section 11</div>
+          <h2>API Specification</h2>
+        </div>
+      </div>
+
+      <h3 style="font-size:14px;font-weight:800;color:var(--primary);margin-bottom:12px">Web Routes (Admin Portal)</h3>
+
+      <div class="api-endpoint">
+        <div class="api-header">
+          <span class="method-badge m-get">GET</span>
+          <span class="api-path">/branches/{branch}/agents</span>
+          <span class="api-desc">List all agents for branch</span>
+        </div>
+        <div class="api-body">
+          <div class="param-list">
+            <span class="param">branch <span class="ptype">int</span></span>
+            <span class="param">filter: active/removed <span class="ptype">string</span></span>
+            <span class="param">page <span class="ptype">int</span></span>
+          </div>
+        </div>
+      </div>
+
+      <div class="api-endpoint">
+        <div class="api-header">
+          <span class="method-badge m-post">POST</span>
+          <span class="api-path">/branches/{branch}/agents</span>
+          <span class="api-desc">Create new agent</span>
+        </div>
+        <div class="api-body">
+          <div class="param-list">
+            <span class="param">name <span class="ptype">string*</span></span>
+            <span class="param">mobile_primary <span class="ptype">string*</span></span>
+            <span class="param">pan_no <span class="ptype">string</span></span>
+            <span class="param">aadhaar_no <span class="ptype">string</span></span>
+            <span class="param">employee_id <span class="ptype">int</span></span>
+            <span class="param">date_of_joining <span class="ptype">date</span></span>
+            <span class="param">bank_account_number <span class="ptype">string</span></span>
+            <span class="param">bank_account_ifsc <span class="ptype">string</span></span>
+          </div>
+        </div>
+      </div>
+
+      <div class="api-endpoint">
+        <div class="api-header">
+          <span class="method-badge m-get">GET</span>
+          <span class="api-path">/branches/{branch}/agents/{agent}</span>
+          <span class="api-desc">Agent 360 detail view</span>
+        </div>
+      </div>
+
+      <div class="api-endpoint">
+        <div class="api-header">
+          <span class="method-badge m-put">PUT</span>
+          <span class="api-path">/branches/{branch}/agents/{agent}</span>
+          <span class="api-desc">Update agent details</span>
+        </div>
+      </div>
+
+      <div class="api-endpoint">
+        <div class="api-header">
+          <span class="method-badge m-delete">DELETE</span>
+          <span class="api-path">/branches/{branch}/agents/{agent}</span>
+          <span class="api-desc">Soft-delete agent</span>
+        </div>
+      </div>
+
+      <div class="api-endpoint">
+        <div class="api-header">
+          <span class="method-badge m-post">POST</span>
+          <span class="api-path">/branches/{branch}/agents/{agent}/merge</span>
+          <span class="api-desc">Merge agent into primary</span>
+        </div>
+        <div class="api-body">
+          <div class="param-list">
+            <span class="param">primary_agent_id <span class="ptype">int*</span></span>
+          </div>
+        </div>
+      </div>
+
+      <div class="api-endpoint">
+        <div class="api-header">
+          <span class="method-badge m-post">POST</span>
+          <span class="api-path">/branches/{branch}/agents/restore</span>
+          <span class="api-desc">Restore soft-deleted agent</span>
+        </div>
+      </div>
+
+      <h3 style="font-size:14px;font-weight:800;color:var(--primary);margin:24px 0 12px">API V2 Routes (Agent Mobile/Portal)</h3>
+
+      <div class="api-endpoint">
+        <div class="api-header">
+          <span class="method-badge m-get">GET</span>
+          <span class="api-path">/api/v2/agents/my_account_details</span>
+          <span class="api-desc">Agent's own profile & KYC data</span>
+        </div>
+        <div class="api-body">
+          <p style="font-size:12px;color:var(--muted)">Returns: AgentResource (id, name, agent_code, email, mobile, addresses, pan, aadhaar, gst, bank, score, branch, employee)</p>
+        </div>
+      </div>
+
+      <div class="api-endpoint">
+        <div class="api-header">
+          <span class="method-badge m-get">GET</span>
+          <span class="api-path">/api/v2/agents/my_enrollments</span>
+          <span class="api-desc">Agent's introduced enrollments with commission breakdown</span>
+        </div>
+        <div class="api-body">
+          <div class="param-list">
+            <span class="param">page <span class="ptype">int</span></span>
+            <span class="param">search <span class="ptype">string</span></span>
+            <span class="param">status <span class="ptype">string</span></span>
+            <span class="param">group_id <span class="ptype">int</span></span>
+            <span class="param">prized <span class="ptype">bool</span></span>
+            <span class="param">sort_by <span class="ptype">string</span></span>
+            <span class="param">sort_dir <span class="ptype">asc|desc</span></span>
+          </div>
+        </div>
+      </div>
+
+      <div class="api-endpoint">
+        <div class="api-header">
+          <span class="method-badge m-post">POST</span>
+          <span class="api-path">/api/v2/auth/agent/login</span>
+          <span class="api-desc">Agent portal authentication</span>
+        </div>
+        <div class="api-body">
+          <div class="param-list">
+            <span class="param">email <span class="ptype">string*</span></span>
+            <span class="param">password <span class="ptype">string*</span></span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── 12. SCORING ENGINE ────────────────────────── -->
+    <section class="section" id="scoring">
+      <div class="section-header">
+        <div class="section-icon">⭐</div>
+        <div>
+          <div class="section-num">Section 12</div>
+          <h2>Scoring Engine</h2>
+        </div>
+      </div>
+
+      <div class="card-grid-2">
+        <div class="card">
+          <h3 style="font-size:14px;font-weight:800;color:var(--primary);margin-bottom:14px">Score Formula</h3>
+          <pre style="margin:0;font-size:12px"><span class="cm">// Final weighted score (0–5)</span>
+<span class="fn">final_score</span> = (
+  enrollments_score × <span class="num">2</span> +
+  introductions_score × <span class="num">3</span>
+) / <span class="num">5</span>
+
+<span class="cm">// Introductions Score (0–1)</span>
+<span class="fn">intro_ratio</span> = introductions_6mo / target
+<span class="fn">introductions_score</span> = min(intro_ratio, <span class="num">1.0</span>)
+
+<span class="cm">// Branch Tier Targets (6 months)</span>
+Urban      → <span class="num">2</span> introductions
+Semi-Urban → <span class="num">1</span> introduction
+Rural      → <span class="num">0.5</span> introductions
+
+<span class="cm">// Enrollments Score (0–1)</span>
+<span class="fn">enrollments_score</span> = avg(enrollment.score) / <span class="num">5</span></pre>
+        </div>
+
+        <div class="card">
+          <h3 style="font-size:14px;font-weight:800;color:var(--primary);margin-bottom:14px">Score Bands</h3>
+          <div style="space-y:8px">
+            <div style="display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid var(--border)">
+              <div style="width:36px;height:36px;border-radius:50%;background:#22c55e;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:800;font-size:12px;flex-shrink:0">★</div>
+              <div><strong>4.5 – 5.0</strong><br><span style="font-size:12px;color:var(--muted)">Elite Agent — Top performer, priority treatment</span></div>
+            </div>
+            <div style="display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid var(--border)">
+              <div style="width:36px;height:36px;border-radius:50%;background:#3b6ef8;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:800;font-size:12px;flex-shrink:0">A</div>
+              <div><strong>3.5 – 4.4</strong><br><span style="font-size:12px;color:var(--muted)">Strong Agent — Consistent performer</span></div>
+            </div>
+            <div style="display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid var(--border)">
+              <div style="width:36px;height:36px;border-radius:50%;background:var(--gold);display:flex;align-items:center;justify-content:center;color:#fff;font-weight:800;font-size:12px;flex-shrink:0">B</div>
+              <div><strong>2.5 – 3.4</strong><br><span style="font-size:12px;color:var(--muted)">Average — Needs improvement plan</span></div>
+            </div>
+            <div style="display:flex;align-items:center;gap:12px;padding:10px 0">
+              <div style="width:36px;height:36px;border-radius:50%;background:#ef4444;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:800;font-size:12px;flex-shrink:0">C</div>
+              <div><strong>0 – 2.4</strong><br><span style="font-size:12px;color:var(--muted)">Underperforming — Review or training needed</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── 13. COMMISSION ENGINE ─────────────────────── -->
+    <section class="section" id="commission">
+      <div class="section-header">
+        <div class="section-icon">💰</div>
+        <div>
+          <div class="section-num">Section 13</div>
+          <h2>Commission Engine</h2>
+        </div>
+      </div>
+
+      <div class="card-grid-3">
+        <div class="feature-card green">
+          <span class="feature-icon">📥</span>
+          <h3>Allocation</h3>
+          <p>When an enrollment becomes active, commission is calculated from <code>agent_commission_percent</code> in the Group Policy and credited to the agent's commission account.</p>
+        </div>
+        <div class="feature-card">
+          <span class="feature-icon">💳</span>
+          <h3>Disbursement</h3>
+          <p>Commission transferred from agent account to bank account. Blocked if <code>is_locked = true</code>. Triggers transaction with purpose <code>INTRODUCER_COMMISSION_DISBURSEMENT</code>.</p>
+        </div>
+        <div class="feature-card red">
+          <span class="feature-icon">↩️</span>
+          <h3>Refund</h3>
+          <p>If an enrollment is removed, the allocated-but-undisbursed commission is refunded back using purpose <code>INTRODUCER_COMMISSION_REFUND</code>.</p>
+        </div>
+      </div>
+
+      <div class="card" style="margin-top:16px">
+        <h3 style="font-size:14px;font-weight:800;color:var(--primary);margin-bottom:14px">Commission Methods (Introducer Trait)</h3>
+        <div class="table-wrap" style="margin:0">
+          <table>
+            <thead><tr><th>Method</th><th>Returns</th><th>Description</th></tr></thead>
+            <tbody>
+              <tr><td><code>introducerCommissionEligibleAmount()</code></td><td>decimal</td><td>Total commission allocated across all introductions</td></tr>
+              <tr><td><code>introducerCommissionDisbursedAmount()</code></td><td>decimal</td><td>Total commission already paid out to bank</td></tr>
+              <tr><td><code>introducerCommissionUndisbursedAmount()</code></td><td>decimal</td><td>Commission pending disbursement (eligible - disbursed)</td></tr>
+              <tr><td><code>getIntroductionDetails()</code></td><td>Collection</td><td>Per-enrollment breakdown: group, scheme, amounts, prize status, installment</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── 14. ROADMAP ──────────────────────────────── -->
+    <section class="section" id="roadmap">
+      <div class="section-header">
+        <div class="section-icon">🗺️</div>
+        <div>
+          <div class="section-num">Section 14</div>
+          <h2>Implementation Roadmap</h2>
+        </div>
+      </div>
+
+      <div class="info-banner">
+        The Agent module already has a strong foundation. AGENT 360 extends it with enhanced analytics, tier system, target management, and a richer mobile portal experience.
+      </div>
+
+      <div class="roadmap">
+
+        <div class="phase">
+          <div class="phase-header">
+            <span class="phase-num">Phase 1 — Complete</span>
+            <h3>Core Agent CRUD</h3>
+            <span class="phase-duration">Done ✅</span>
+          </div>
+          <div class="phase-card">
+            <ul class="phase-tasks">
+              <li>✅ agents table + migrations</li>
+              <li>✅ Agent model + traits</li>
+              <li>✅ AgentsController (web)</li>
+              <li>✅ AgentPolicy (permissions)</li>
+              <li>✅ CRUD views (index, show, create, edit)</li>
+              <li>✅ Auto agent code generation</li>
+              <li>✅ Soft delete + restore</li>
+              <li>✅ Elasticsearch search indexing</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="phase">
+          <div class="phase-header">
+            <span class="phase-num">Phase 2 — Complete</span>
+            <h3>Commission & Scoring</h3>
+            <span class="phase-duration">Done ✅</span>
+          </div>
+          <div class="phase-card">
+            <ul class="phase-tasks">
+              <li>✅ Introduction tracking (morphMany)</li>
+              <li>✅ Commission allocation pipeline</li>
+              <li>✅ Commission disbursement + refund</li>
+              <li>✅ Performance scoring (0–5)</li>
+              <li>✅ UpdateAgentScoresJob</li>
+              <li>✅ Agent lock / unlock</li>
+              <li>✅ Agent merge</li>
+              <li>✅ Audit trail + change logs</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="phase">
+          <div class="phase-header">
+            <span class="phase-num">Phase 3 — Complete</span>
+            <h3>Mobile API Portal</h3>
+            <span class="phase-duration">Done ✅</span>
+          </div>
+          <div class="phase-card">
+            <ul class="phase-tasks">
+              <li>✅ API V2 agent authentication</li>
+              <li>✅ my_account_details endpoint</li>
+              <li>✅ my_enrollments endpoint</li>
+              <li>✅ AgentResource transformer</li>
+              <li>✅ Pagination, search, filter, sort</li>
+              <li>✅ JWT auth + person_type routing</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="phase current">
+          <div class="phase-header">
+            <span class="phase-num" style="background:#fef3c7;color:#92400e">Phase 4 — Planned</span>
+            <h3>AGENT 360 Dashboard & Analytics</h3>
+            <span class="phase-duration">Next Sprint</span>
+          </div>
+          <div class="phase-card">
+            <ul class="phase-tasks">
+              <li>🔲 Agent Tier classification (Bronze/Silver/Gold/Elite)</li>
+              <li>🔲 Monthly & quarterly introduction targets</li>
+              <li>🔲 Branch-level agent leaderboard</li>
+              <li>🔲 Commission trend charts (monthly)</li>
+              <li>🔲 Introduction funnel analytics</li>
+              <li>🔲 Agent comparison report (multi-agent)</li>
+              <li>🔲 Export: Agent performance PDF</li>
+              <li>🔲 KPI dashboard cards in 360 view</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="phase">
+          <div class="phase-header">
+            <span class="phase-num">Phase 5 — Future</span>
+            <h3>Agent Self-Service & Notifications</h3>
+            <span class="phase-duration">Q3 2026</span>
+          </div>
+          <div class="phase-card">
+            <ul class="phase-tasks">
+              <li>🔲 Push notifications on commission updates</li>
+              <li>🔲 Agent can request document updates via portal</li>
+              <li>🔲 Monthly commission statement (PDF download)</li>
+              <li>🔲 Referral tracking (agent referring other agents)</li>
+              <li>🔲 Agent training module completion tracking</li>
+              <li>🔲 WhatsApp notification on disbursement</li>
+            </ul>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ── 15. CONFIG ───────────────────────────────── -->
+    <section class="section" id="config">
+      <div class="section-header">
+        <div class="section-icon">⚙️</div>
+        <div>
+          <div class="section-num">Section 15</div>
+          <h2>Configuration Flags</h2>
+        </div>
+      </div>
+
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr><th>Feature Flag</th><th>Env Variable</th><th>Default</th><th>Description</th></tr>
+          </thead>
+          <tbody>
+            <tr><td><code>features.agents.view_any</code></td><td><code>ALL_AGENTS_VIEWABLE_BY_ANY_ROLE</code></td><td>true</td><td>Allow any authenticated role to view agents</td></tr>
+            <tr><td><code>features.agents.access</code></td><td><code>AGENTS_ACCESS</code></td><td>false</td><td>Enable agent portal (mobile app login)</td></tr>
+            <tr><td><code>features.agents.back_office_executive_create_access</code></td><td><code>BACK_OFFICE_EXECUTIVE_AGENT_CREATE_ACCESS</code></td><td>true</td><td>Allow Back Office Exec to create agents</td></tr>
+            <tr><td><code>features.agents.back_office_executive_edit_access</code></td><td><code>BACK_OFFICE_EXECUTIVE_AGENT_EDIT_ACCESS</code></td><td>true</td><td>Allow Back Office Exec to edit agents</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="card-grid-2" style="margin-top:16px">
+        <div class="card">
+          <h3 style="font-size:14px;font-weight:800;color:var(--primary);margin-bottom:14px">Score Tier Targets by Branch Type</h3>
+          <div class="table-wrap" style="margin:0">
+            <table>
+              <thead><tr><th>Branch Tier</th><th>6-Month Target</th><th>Full Score At</th></tr></thead>
+              <tbody>
+                <tr><td>Urban</td><td>2 introductions</td><td>≥ 2 → 1.0 intro score</td></tr>
+                <tr><td>Semi-Urban</td><td>1 introduction</td><td>≥ 1 → 1.0 intro score</td></tr>
+                <tr><td>Rural</td><td>0.5 introductions</td><td>≥ 1 → 1.0 intro score</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+        <div class="card">
+          <h3 style="font-size:14px;font-weight:800;color:var(--primary);margin-bottom:14px">Search Index Fields</h3>
+          <div class="table-wrap" style="margin:0">
+            <table>
+              <thead><tr><th>Field</th><th>Index Type</th></tr></thead>
+              <tbody>
+                <tr><td>entity_type</td><td>keyword</td></tr>
+                <tr><td>agent_code</td><td>sanitized text</td></tr>
+                <tr><td>agent_name</td><td>sanitized text</td></tr>
+                <tr><td>mobile_primary / mobile_alternate</td><td>text</td></tr>
+                <tr><td>email</td><td>text</td></tr>
+                <tr><td>pan_no / aadhaar_no / ration_no / gst_no</td><td>text</td></tr>
+                <tr><td>branch_name / branch_code</td><td>text + keyword</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── 16. SYSTEM DATA FLOW ─────────────────────── -->
+    <section class="section" id="dataflow">
+      <div class="section-header">
+        <div class="section-icon">🌊</div>
+        <div>
+          <div class="section-num">Section 16</div>
+          <h2>System Data Flow</h2>
+        </div>
+      </div>
+
+      <div class="info-banner">
+        These diagrams show how data moves through the system for the three most critical AGENT 360 operations.
+        Each layer transforms or gates the data before passing it downstream.
+      </div>
+
+      <!-- DFD 1: Full Request Lifecycle -->
+      <h3 style="font-size:14px;font-weight:800;color:var(--primary);margin-bottom:16px">DFD 01 — Agent Request Lifecycle (Admin Portal)</h3>
+      <div class="dfd-wrap">
+        <div class="dfd-layer">
+          <div class="dfd-tier">
+            <div class="dfd-box accent-box">
+              <h4>Browser</h4>
+              <p>Admin / Back-Office submits form or navigates</p>
+            </div>
+            <div class="dfd-subtitle">Entry point</div>
+          </div>
+
+          <div class="dfd-conn">
+            <div class="dfd-conn-label">HTTP request</div>
+            <div class="dfd-arr">▶</div>
+          </div>
+
+          <div class="dfd-tier">
+            <div class="dfd-box">
+              <h4>Auth Middleware</h4>
+              <p>Validate session / token. Reject if unauthenticated</p>
+            </div>
+            <div class="dfd-subtitle">Gate 1</div>
+          </div>
+
+          <div class="dfd-conn">
+            <div class="dfd-conn-label">Authenticated user</div>
+            <div class="dfd-arr">▶</div>
+          </div>
+
+          <div class="dfd-tier">
+            <div class="dfd-box gold-box">
+              <h4>AgentPolicy</h4>
+              <p>Role + feature-flag check. 403 if denied</p>
+            </div>
+            <div class="dfd-subtitle">Gate 2</div>
+          </div>
+
+          <div class="dfd-conn">
+            <div class="dfd-conn-label">Authorized</div>
+            <div class="dfd-arr">▶</div>
+          </div>
+
+          <div class="dfd-tier">
+            <div class="dfd-box accent-box">
+              <h4>AgentsController</h4>
+              <p>Validate input. Dispatch to model method</p>
+            </div>
+            <div class="dfd-subtitle">Controller</div>
+          </div>
+
+          <div class="dfd-conn">
+            <div class="dfd-conn-label">Model call</div>
+            <div class="dfd-arr">▶</div>
+          </div>
+
+          <div class="dfd-tier">
+            <div class="dfd-box green-box">
+              <h4>Agent Model</h4>
+              <p>Business logic, traits, relationships, events</p>
+            </div>
+            <div class="dfd-subtitle">Domain</div>
+          </div>
+
+          <div class="dfd-conn">
+            <div class="dfd-conn-label">SQL + events</div>
+            <div class="dfd-arr">▶</div>
+          </div>
+
+          <div class="dfd-tier">
+            <div class="dfd-box">
+              <h4>MySQL</h4>
+              <p>agents table + related tables (enrollments, docs, users)</p>
+            </div>
+            <div class="dfd-subtitle">Persistence</div>
+          </div>
+
+          <div class="dfd-conn">
+            <div class="dfd-conn-label">Index sync</div>
+            <div class="dfd-arr">▶</div>
+          </div>
+
+          <div class="dfd-tier">
+            <div class="dfd-box purple-box">
+              <h4>Elasticsearch</h4>
+              <p>Search index updated via Laravel Scout</p>
+            </div>
+            <div class="dfd-subtitle">Search index</div>
+          </div>
+        </div>
+
+        <div style="margin-top:32px;padding-top:24px;border-top:1px solid var(--border)">
+          <div style="font-size:12px;font-weight:800;color:var(--primary);margin-bottom:12px">Side Effects triggered by Agent Model events</div>
+          <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px">
+            <div style="background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:14px">
+              <div style="font-size:11px;font-weight:700;color:var(--primary);margin-bottom:4px">🔢 Code Generation</div>
+              <div style="font-size:11px;color:var(--muted)">creating event → auto-set <code>agent_code</code> via MAX REGEXP on branch</div>
+            </div>
+            <div style="background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:14px">
+              <div style="font-size:11px;font-weight:700;color:var(--primary);margin-bottom:4px">⭐ Score Update</div>
+              <div style="font-size:11px;color:var(--muted)">Enrollment changes → observer calls <code>agent->updateScore()</code></div>
+            </div>
+            <div style="background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:14px">
+              <div style="font-size:11px;font-weight:700;color:var(--primary);margin-bottom:4px">📋 Audit Log</div>
+              <div style="font-size:11px;color:var(--muted)">Any change → <code>HasCustomAudits</code> writes to audits table</div>
+            </div>
+            <div style="background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:14px">
+              <div style="font-size:11px;font-weight:700;color:var(--primary);margin-bottom:4px">🔍 Search Sync</div>
+              <div style="font-size:11px;color:var(--muted)">saved/deleted events → Scout pushes to <code>{env}_agents</code> index</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- DFD 2: Commission Data Flow -->
+      <h3 style="font-size:14px;font-weight:800;color:var(--primary);margin-bottom:16px">DFD 02 — Commission Data Flow</h3>
+      <div class="dfd-wrap">
+        <div class="dfd-layer">
+          <div class="dfd-tier">
+            <div class="dfd-box accent-box">
+              <h4>Enrollment Event</h4>
+              <p>Status changes to active</p>
+            </div>
+            <div class="dfd-subtitle">Trigger</div>
+          </div>
+          <div class="dfd-conn"><div class="dfd-conn-label">introducer_type check</div><div class="dfd-arr">▶</div></div>
+
+          <div class="dfd-tier">
+            <div class="dfd-box gold-box">
+              <h4>Group Policy</h4>
+              <p><code>agent_commission_percent</code> × membership amount</p>
+            </div>
+            <div class="dfd-subtitle">Rate source</div>
+          </div>
+          <div class="dfd-conn"><div class="dfd-conn-label">commission amount</div><div class="dfd-arr">▶</div></div>
+
+          <div class="dfd-tier">
+            <div class="dfd-box green-box">
+              <h4>Allocation Txn</h4>
+              <p>Transaction created: <code>INTRODUCER_COMMISSION_ALLOCATION</code></p>
+            </div>
+            <div class="dfd-subtitle">Ledger entry</div>
+          </div>
+          <div class="dfd-conn"><div class="dfd-conn-label">when disbursed</div><div class="dfd-arr">▶</div></div>
+
+          <div class="dfd-tier">
+            <div class="dfd-box gold-box">
+              <h4>Lock Check</h4>
+              <p><code>is_locked</code>? Block disbursement if true</p>
+            </div>
+            <div class="dfd-subtitle">Compliance gate</div>
+          </div>
+          <div class="dfd-conn"><div class="dfd-conn-label">if not locked</div><div class="dfd-arr">▶</div></div>
+
+          <div class="dfd-tier">
+            <div class="dfd-box accent-box">
+              <h4>Disbursement Txn</h4>
+              <p>Transaction: <code>INTRODUCER_COMMISSION_DISBURSEMENT</code></p>
+            </div>
+            <div class="dfd-subtitle">Payout</div>
+          </div>
+          <div class="dfd-conn"><div class="dfd-conn-label">bank transfer</div><div class="dfd-arr">▶</div></div>
+
+          <div class="dfd-tier">
+            <div class="dfd-box green-box">
+              <h4>Agent Bank A/C</h4>
+              <p><code>bank_account_number</code> + <code>bank_account_ifsc</code></p>
+            </div>
+            <div class="dfd-subtitle">Destination</div>
+          </div>
+        </div>
+
+        <div style="margin-top:20px;padding-top:16px;border-top:1px solid var(--border);display:flex;gap:16px;flex-wrap:wrap">
+          <div style="flex:1;min-width:200px;background:#fef2f2;border:1px solid #fca5a5;border-radius:8px;padding:14px">
+            <div style="font-size:11px;font-weight:700;color:#991b1b;margin-bottom:4px">↩ Refund Path</div>
+            <div style="font-size:11px;color:#7f1d1d">If enrollment is removed → <code>INTRODUCER_COMMISSION_REFUND</code> transaction reverses the allocation</div>
+          </div>
+          <div style="flex:1;min-width:200px;background:#fef9c3;border:1px solid #fde047;border-radius:8px;padding:14px">
+            <div style="font-size:11px;font-weight:700;color:#854d0e;margin-bottom:4px">🔒 Lock Block Path</div>
+            <div style="font-size:11px;color:#78350f">If <code>is_locked = true</code> → disbursement throws exception, commission stays allocated</div>
+          </div>
+          <div style="flex:1;min-width:200px;background:#f0fdf4;border:1px solid #86efac;border-radius:8px;padding:14px">
+            <div style="font-size:11px;font-weight:700;color:#166534;margin-bottom:4px">📊 Balance Tracking</div>
+            <div style="font-size:11px;color:#14532d">Eligible = Σ allocations &nbsp;·&nbsp; Disbursed = Σ disbursements &nbsp;·&nbsp; Pending = Eligible − Disbursed</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- DFD 3: Mobile API Flow -->
+      <h3 style="font-size:14px;font-weight:800;color:var(--primary);margin-bottom:16px">DFD 03 — Mobile API Data Flow (Agent Portal)</h3>
+      <div class="dfd-wrap">
+        <div class="dfd-layer">
+          <div class="dfd-tier">
+            <div class="dfd-box accent-box">
+              <h4>Mobile App</h4>
+              <p>Agent logs in with email + password</p>
+            </div>
+            <div class="dfd-subtitle">Client</div>
+          </div>
+          <div class="dfd-conn"><div class="dfd-conn-label">POST /auth/login</div><div class="dfd-arr">▶</div></div>
+
+          <div class="dfd-tier">
+            <div class="dfd-box gold-box">
+              <h4>Auth Service</h4>
+              <p>Resolve <code>person_type = 'App\Agent'</code>. Issue JWT token</p>
+            </div>
+            <div class="dfd-subtitle">Auth</div>
+          </div>
+          <div class="dfd-conn"><div class="dfd-conn-label">Bearer token</div><div class="dfd-arr">▶</div></div>
+
+          <div class="dfd-tier">
+            <div class="dfd-box">
+              <h4>API V2 Routes</h4>
+              <p><code>my_account_details</code> <code>my_enrollments</code></p>
+            </div>
+            <div class="dfd-subtitle">Routing</div>
+          </div>
+          <div class="dfd-conn"><div class="dfd-conn-label">controller call</div><div class="dfd-arr">▶</div></div>
+
+          <div class="dfd-tier">
+            <div class="dfd-box green-box">
+              <h4>AgentController</h4>
+              <p>Scope query to authenticated agent. Paginate, filter, sort</p>
+            </div>
+            <div class="dfd-subtitle">Logic</div>
+          </div>
+          <div class="dfd-conn"><div class="dfd-conn-label">DB query</div><div class="dfd-arr">▶</div></div>
+
+          <div class="dfd-tier">
+            <div class="dfd-box">
+              <h4>MySQL</h4>
+              <p>agents + enrollments + groups + transactions joined</p>
+            </div>
+            <div class="dfd-subtitle">Data</div>
+          </div>
+          <div class="dfd-conn"><div class="dfd-conn-label">transform</div><div class="dfd-arr">▶</div></div>
+
+          <div class="dfd-tier">
+            <div class="dfd-box purple-box">
+              <h4>AgentResource</h4>
+              <p>JSON shape: profile, score, branch, enrollments array</p>
+            </div>
+            <div class="dfd-subtitle">Response</div>
+          </div>
+        </div>
+      </div>
+
+    </section>
+
+    <!-- ── 17. FLOWCHARTS ────────────────────────────── -->
+    <section class="section" id="flowcharts">
+      <div class="section-header">
+        <div class="section-icon">📐</div>
+        <div>
+          <div class="section-num">Section 17</div>
+          <h2>Flowcharts</h2>
+        </div>
+      </div>
+
+      <!-- FC 1: Agent Onboarding -->
+      <div class="fc-wrap">
+        <div class="fc-title">
+          FC 01 — Agent Onboarding Flow
+          <span class="fc-tag">Web Portal</span>
+        </div>
+
+        <div style="display:flex;flex-direction:column;align-items:center;gap:0;min-width:320px">
+
+          <div class="fc-node start">Start</div>
+          <div class="fc-arr-d">↓</div>
+
+          <div class="fc-node process">Admin opens<br>Create Agent form</div>
+          <div class="fc-arr-d">↓</div>
+
+          <div class="fc-node process">Fill: name, mobile,<br>address, PAN, Aadhaar</div>
+          <div class="fc-arr-d">↓</div>
+
+          <!-- Decision: Validation -->
+          <div class="fc-diamond-wrap">
+            <div class="fc-diamond blue"></div>
+            <div class="fc-diamond-label blue-lbl">Form<br>Valid?</div>
+          </div>
+
+          <div style="display:flex;align-items:flex-start;gap:80px;margin-top:0">
+            <div style="display:flex;flex-direction:column;align-items:center">
+              <div class="fc-no-label">No</div>
+              <div class="fc-arr-d">↓</div>
+              <div class="fc-node process" style="background:#fef2f2;border-color:#ef4444;color:#991b1b">Show validation<br>error messages</div>
+              <div class="fc-arr-d">↓</div>
+              <div style="font-size:11px;color:var(--muted);font-style:italic">← back to form</div>
+            </div>
+            <div style="display:flex;flex-direction:column;align-items:center">
+              <div class="fc-yes-label">Yes</div>
+              <div class="fc-arr-d">↓</div>
+              <div class="fc-node process-green">Save agent record<br>to DB</div>
+              <div class="fc-arr-d">↓</div>
+              <div class="fc-node process-gold">Auto-generate<br>agent_code<br><small style="font-size:10px">{branch}-AGT-{n}</small></div>
+              <div class="fc-arr-d">↓</div>
+              <div class="fc-node process">Sync to<br>Elasticsearch index</div>
+              <div class="fc-arr-d">↓</div>
+
+              <!-- Decision: Provision User -->
+              <div class="fc-diamond-wrap">
+                <div class="fc-diamond"></div>
+                <div class="fc-diamond-label">Provision<br>portal access?</div>
+              </div>
+
+              <div style="display:flex;align-items:flex-start;gap:60px;margin-top:0">
+                <div style="display:flex;flex-direction:column;align-items:center">
+                  <div class="fc-yes-label">Yes</div>
+                  <div class="fc-arr-d">↓</div>
+                  <div class="fc-node process-purple">Create User record<br><code style="font-size:10px">person_type='App\Agent'</code></div>
+                  <div class="fc-arr-d">↓</div>
+                  <div class="fc-node process-green">Send login<br>credentials</div>
+                </div>
+                <div style="display:flex;flex-direction:column;align-items:center">
+                  <div class="fc-no-label">No</div>
+                  <div class="fc-arr-d">↓</div>
+                  <div class="fc-node io">Skip user<br>provisioning</div>
+                </div>
+              </div>
+
+              <div class="fc-arr-d" style="margin-top:8px">↓</div>
+              <div class="fc-node end">Agent Created ✓</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- FC 2: Commission Disbursement -->
+      <div class="fc-wrap">
+        <div class="fc-title">
+          FC 02 — Commission Disbursement Flow
+          <span class="fc-tag">Commission Engine</span>
+        </div>
+
+        <div style="display:flex;flex-direction:column;align-items:center;gap:0">
+
+          <div class="fc-node start">Enrollment<br>Activated</div>
+          <div class="fc-arr-d">↓</div>
+
+          <div class="fc-node process">Check introducer_type<br>= 'App\Agent'</div>
+          <div class="fc-arr-d">↓</div>
+
+          <!-- Decision: Has introducer -->
+          <div class="fc-diamond-wrap">
+            <div class="fc-diamond blue"></div>
+            <div class="fc-diamond-label blue-lbl">Has Agent<br>Introducer?</div>
+          </div>
+
+          <div style="display:flex;align-items:flex-start;gap:80px;margin-top:0">
+            <div style="display:flex;flex-direction:column;align-items:center">
+              <div class="fc-no-label">No</div>
+              <div class="fc-arr-d">↓</div>
+              <div class="fc-node io">No commission<br>allocated</div>
+              <div class="fc-arr-d">↓</div>
+              <div class="fc-node end">End</div>
+            </div>
+            <div style="display:flex;flex-direction:column;align-items:center">
+              <div class="fc-yes-label">Yes</div>
+              <div class="fc-arr-d">↓</div>
+              <div class="fc-node process-gold">Calculate amount<br><code style="font-size:10px">agent_commission_percent × membership</code></div>
+              <div class="fc-arr-d">↓</div>
+              <div class="fc-node process-green">Create ALLOCATION<br>transaction</div>
+              <div class="fc-arr-d">↓</div>
+
+              <div style="font-size:12px;font-weight:700;color:var(--primary);margin:8px 0">— Disbursement Request —</div>
+
+              <!-- Decision: Is Locked -->
+              <div class="fc-diamond-wrap">
+                <div class="fc-diamond red-d"></div>
+                <div class="fc-diamond-label red-lbl">Agent<br>Locked?</div>
+              </div>
+
+              <div style="display:flex;align-items:flex-start;gap:60px;margin-top:0">
+                <div style="display:flex;flex-direction:column;align-items:center">
+                  <div class="fc-yes-label" style="background:#fef2f2;color:#991b1b">Yes</div>
+                  <div class="fc-arr-d">↓</div>
+                  <div class="fc-node process" style="background:#fef2f2;border-color:#ef4444;color:#991b1b">Block disbursement<br>Show lock reason</div>
+                  <div class="fc-arr-d">↓</div>
+                  <div class="fc-node end-red">Blocked 🔒</div>
+                </div>
+                <div style="display:flex;flex-direction:column;align-items:center">
+                  <div class="fc-no-label" style="background:#dcfce7;color:#166534">No</div>
+                  <div class="fc-arr-d">↓</div>
+                  <div class="fc-node process-green">Create DISBURSEMENT<br>transaction</div>
+                  <div class="fc-arr-d">↓</div>
+                  <div class="fc-node process-green">Transfer to<br>bank account</div>
+                  <div class="fc-arr-d">↓</div>
+                  <div class="fc-node end">Disbursed ✓</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- FC 3: Score Recalculation -->
+      <div class="fc-wrap">
+        <div class="fc-title">
+          FC 03 — Score Recalculation Flow
+          <span class="fc-tag">Scoring Engine</span>
+        </div>
+
+        <div style="display:flex;flex-direction:column;align-items:center;gap:0">
+
+          <div class="fc-node start">Trigger Event</div>
+          <div class="fc-arr-d">↓</div>
+
+          <div class="fc-node io" style="max-width:320px;text-align:center">Enrollment status changed (active / removed / prized) <br>OR Admin runs UpdateAgentScoresJob</div>
+          <div class="fc-arr-d">↓</div>
+
+          <div class="fc-node process-gold">Fetch enrollments introduced<br>in last 6 months</div>
+          <div class="fc-arr-d">↓</div>
+
+          <div class="fc-node process">Read branch.tier<br>(Urban / Semi-Urban / Rural)</div>
+          <div class="fc-arr-d">↓</div>
+
+          <div class="fc-node process-gold">Get intro target<br><small>Urban→2 &nbsp; Semi→1 &nbsp; Rural→0.5</small></div>
+          <div class="fc-arr-d">↓</div>
+
+          <div class="fc-node process-gold"><code>introductions_score = min(count / target, 1.0)</code></div>
+          <div class="fc-arr-d">↓</div>
+
+          <div class="fc-node process">Fetch all active introduction<br>enrollment scores</div>
+          <div class="fc-arr-d">↓</div>
+
+          <!-- Decision: has enrollments -->
+          <div class="fc-diamond-wrap">
+            <div class="fc-diamond blue"></div>
+            <div class="fc-diamond-label blue-lbl">Has active<br>enrollments?</div>
+          </div>
+
+          <div style="display:flex;align-items:flex-start;gap:60px;margin-top:0">
+            <div style="display:flex;flex-direction:column;align-items:center">
+              <div class="fc-no-label">No</div>
+              <div class="fc-arr-d">↓</div>
+              <div class="fc-node io">enrollments_score = 0</div>
+            </div>
+            <div style="display:flex;flex-direction:column;align-items:center">
+              <div class="fc-yes-label">Yes</div>
+              <div class="fc-arr-d">↓</div>
+              <div class="fc-node process-green"><code>enrollments_score = avg(score) / 5</code></div>
+            </div>
+          </div>
+
+          <div class="fc-arr-d" style="margin-top:8px">↓</div>
+
+          <div class="fc-node process-green" style="max-width:280px">
+            <code>final_score = (enrollments×2 + introductions×3) / 5</code>
+          </div>
+          <div class="fc-arr-d">↓</div>
+
+          <div class="fc-node process">Persist: score,<br>introductions_score,<br>enrollments_score</div>
+          <div class="fc-arr-d">↓</div>
+
+          <div class="fc-node end">Score Updated ✓</div>
+        </div>
+      </div>
+
+      <!-- FC 4: Agent Lock Flow -->
+      <div class="fc-wrap">
+        <div class="fc-title">
+          FC 04 — Agent Lock / Unlock Flow
+          <span class="fc-tag">Compliance</span>
+        </div>
+
+        <div style="display:flex;flex-direction:column;align-items:center;gap:0">
+
+          <div class="fc-node start">Admin Action</div>
+          <div class="fc-arr-d">↓</div>
+
+          <!-- Decision: Permission -->
+          <div class="fc-diamond-wrap">
+            <div class="fc-diamond blue"></div>
+            <div class="fc-diamond-label blue-lbl">Role = Cluster<br>Admin or above?</div>
+          </div>
+
+          <div style="display:flex;align-items:flex-start;gap:80px;margin-top:0">
+            <div style="display:flex;flex-direction:column;align-items:center">
+              <div class="fc-no-label">No</div>
+              <div class="fc-arr-d">↓</div>
+              <div class="fc-node process" style="background:#fef2f2;border-color:#ef4444;color:#991b1b">Return 403<br>Forbidden</div>
+              <div class="fc-arr-d">↓</div>
+              <div class="fc-node end-red">Denied</div>
+            </div>
+            <div style="display:flex;flex-direction:column;align-items:center">
+              <div class="fc-yes-label">Yes</div>
+              <div class="fc-arr-d">↓</div>
+
+              <!-- Decision: Lock or Unlock -->
+              <div class="fc-diamond-wrap">
+                <div class="fc-diamond"></div>
+                <div class="fc-diamond-label">Lock or<br>Unlock?</div>
+              </div>
+
+              <div style="display:flex;align-items:flex-start;gap:48px;margin-top:0">
+                <div style="display:flex;flex-direction:column;align-items:center">
+                  <div style="font-size:10px;font-weight:700;background:#fef2f2;color:#991b1b;padding:2px 8px;border-radius:10px;margin-bottom:4px">Lock</div>
+                  <div class="fc-arr-d">↓</div>
+                  <div class="fc-node process" style="background:#fef2f2;border-color:#ef4444;color:#991b1b">Set is_locked = true<br>Store lock_message</div>
+                  <div class="fc-arr-d">↓</div>
+                  <div class="fc-node process">Log audit:<br>'agent locked'</div>
+                  <div class="fc-arr-d">↓</div>
+                  <div class="fc-node io">Block: commission<br>disbursement,<br>document upload</div>
+                  <div class="fc-arr-d">↓</div>
+                  <div class="fc-node end-red">Agent Locked 🔒</div>
+                </div>
+                <div style="display:flex;flex-direction:column;align-items:center">
+                  <div style="font-size:10px;font-weight:700;background:#dcfce7;color:#166534;padding:2px 8px;border-radius:10px;margin-bottom:4px">Unlock</div>
+                  <div class="fc-arr-d">↓</div>
+                  <div class="fc-node process-green">Set is_locked = false<br>Clear lock_message</div>
+                  <div class="fc-arr-d">↓</div>
+                  <div class="fc-node process">Log audit:<br>'agent unlocked'</div>
+                  <div class="fc-arr-d">↓</div>
+                  <div class="fc-node io">Restore: commission<br>disbursement,<br>document upload</div>
+                  <div class="fc-arr-d">↓</div>
+                  <div class="fc-node end">Agent Unlocked ✓</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- FC 5: Agent Merge -->
+      <div class="fc-wrap">
+        <div class="fc-title">
+          FC 05 — Agent Merge Flow
+          <span class="fc-tag">Data Consolidation</span>
+        </div>
+
+        <div style="display:flex;flex-direction:column;align-items:center;gap:0">
+
+          <div class="fc-node start">Admin opens<br>Merge screen</div>
+          <div class="fc-arr-d">↓</div>
+
+          <div class="fc-node process">Select primary agent<br>(target for merge)</div>
+          <div class="fc-arr-d">↓</div>
+
+          <!-- Decision: Same agent? -->
+          <div class="fc-diamond-wrap">
+            <div class="fc-diamond red-d"></div>
+            <div class="fc-diamond-label red-lbl">Same agent<br>selected?</div>
+          </div>
+
+          <div style="display:flex;align-items:flex-start;gap:80px;margin-top:0">
+            <div style="display:flex;flex-direction:column;align-items:center">
+              <div class="fc-yes-label" style="background:#fef2f2;color:#991b1b">Yes</div>
+              <div class="fc-arr-d">↓</div>
+              <div class="fc-node process" style="background:#fef2f2;border-color:#ef4444;color:#991b1b">Error: cannot merge<br>agent with itself</div>
+              <div class="fc-arr-d">↓</div>
+              <div class="fc-node end-red">Aborted</div>
+            </div>
+            <div style="display:flex;flex-direction:column;align-items:center">
+              <div class="fc-no-label">No</div>
+              <div class="fc-arr-d">↓</div>
+              <div class="fc-node process">Transfer all <strong>Introductions</strong><br>to primary agent</div>
+              <div class="fc-arr-d">↓</div>
+              <div class="fc-node process">Reset enrollment<br>commission transactions<br>for new introducer</div>
+              <div class="fc-arr-d">↓</div>
+              <div class="fc-node process">Transfer all <strong>Documents</strong><br>to primary agent</div>
+              <div class="fc-arr-d">↓</div>
+              <div class="fc-node process">Transfer all <strong>Relationships</strong><br>to primary agent</div>
+              <div class="fc-arr-d">↓</div>
+              <div class="fc-node process-gold">Recalculate score<br>for primary agent</div>
+              <div class="fc-arr-d">↓</div>
+              <div class="fc-node process" style="background:#fef2f2;border-color:#ef4444;color:#991b1b">Delete duplicate<br>agent record</div>
+              <div class="fc-arr-d">↓</div>
+              <div class="fc-node end">Merge Complete ✓</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </section>
+
+  </div><!-- /content -->
+
+  <!-- FOOTER -->
+  <div class="footer">
+    <strong>AGENT 360</strong> — Design & Technical Documentation &nbsp;·&nbsp;
+    ROSCA Digital Platform &nbsp;·&nbsp; v1.0 &nbsp;·&nbsp; May 2026<br>
+    <span style="font-size:11px;margin-top:6px;display:block">
+      Deep-analyzed from: Agent.php · AgentsController.php · AgentPolicy.php ·
+      Introducer trait · HasUserAccess trait · 12 migrations · AgentFactory · tests
+    </span>
+  </div>
+
+</main>
+
+<script>
+  // Highlight active nav item on scroll
+  const sections = document.querySelectorAll('.section');
+  const navItems = document.querySelectorAll('.nav-item');
+
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        navItems.forEach(item => item.classList.remove('active'));
+        const id = entry.target.id;
+        const activeItem = document.querySelector(`.nav-item[href="#${id}"]`);
+        if (activeItem) activeItem.classList.add('active');
+      }
+    });
+  }, { rootMargin: '-10% 0px -80% 0px' });
+
+  sections.forEach(s => observer.observe(s));
+</script>
+
+</body>
+</html>

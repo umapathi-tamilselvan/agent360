@@ -1,0 +1,835 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Agent Portal — DNC CHITS</title>
+
+  <!-- Fonts (same as project) -->
+  <link rel="dns-prefetch" href="//fonts.gstatic.com">
+  <link href="https://fonts.googleapis.com/css?family=Nunito" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+
+  <!-- OneUI CSS (actual project CSS) -->
+  <link rel="stylesheet" href="./assets/css/oneui.css">
+  <link rel="stylesheet" href="./assets/css/app.css">
+
+  <style>
+    /* ── Agent portal custom (agent POV only) ──────── */
+    .score-star { color: #f4a823; }
+
+    /* Ledger persistent header */
+    .ledger-band { border: 1px solid #e4e7ed; border-radius: 3px; overflow: hidden; margin-bottom: 16px; }
+    .ledger-band-title {
+      background: #1a2744; color: #fff; padding: 8px 16px;
+      font-size: 12px; font-weight: 700;
+      display: flex; justify-content: space-between; align-items: center;
+    }
+    .ledger-id-grid {
+      display: grid; grid-template-columns: repeat(4,1fr);
+      border-bottom: 1px solid #e4e7ed;
+    }
+    .ledger-id-cell {
+      padding: 9px 14px; border-right: 1px solid #e4e7ed;
+    }
+    .ledger-id-cell:last-child { border-right: none; }
+    .ledger-id-label { font-size: 10px; color: #6c757d; margin-bottom: 1px; }
+    .ledger-id-val   { font-size: 13px; font-weight: 600; color: #1a2744; }
+
+    .kpi-band-table { width: 100%; border-collapse: collapse; }
+    .kpi-band-table th {
+      background: #1a2744; color: rgba(255,255,255,.8);
+      padding: 7px 10px; font-size: 10px; font-weight: 700;
+      text-transform: uppercase; text-align: center;
+      border: 1px solid rgba(255,255,255,.08); white-space: nowrap;
+    }
+    .kpi-band-table td {
+      padding: 9px 12px; text-align: center;
+      border: 1px solid #e4e7ed; font-size: 12px;
+    }
+    .kv      { font-size: 16px; font-weight: 800; color: #1a2744; display: block; }
+    .kv.gold { color: #f4a823; }
+    .kv.gr   { color: #28a745; }
+    .kv.rd   { color: #dc3545; }
+    .ks      { font-size: 10px; color: #6c757d; }
+
+    .band-blue  { background: #2d4a9e !important; }
+    .band-blue2 { background: #3558b8 !important; }
+    .band-grn   { background: #1a6e38 !important; }
+    .band-grn2  { background: #20884a !important; }
+
+    /* Commission summary cards */
+    .comm-card {
+      background: #fff; border: 1px solid #e4e7ed;
+      border-radius: 3px; padding: 16px 18px; text-align: center;
+    }
+    .comm-card .cv { font-size: 22px; font-weight: 800; display: block; line-height: 1.1; margin-bottom: 3px; }
+    .comm-card .cl { font-size: 10px; text-transform: uppercase; letter-spacing: 1px; color: #6c757d; font-weight: 600; }
+
+    /* Filter bar */
+    .filter-bar {
+      background: #fff8f0; border: 1px solid #fde8c0;
+      border-radius: 3px; padding: 10px 14px; margin-bottom: 14px;
+      display: flex; align-items: center; gap: 8px; flex-wrap: wrap;
+    }
+    .filter-tag {
+      background: #fef3c7; border: 1px solid #f59e0b; color: #78350f;
+      font-size: 11px; font-weight: 700; padding: 3px 10px; border-radius: 3px;
+    }
+    .filter-ctrl {
+      padding: 4px 10px; background: #fff; border: 1px solid #ced4da;
+      border-radius: 3px; font-size: 11px; color: #495057;
+    }
+
+    /* Status chips */
+    .ch { display: inline-block; padding: 2px 8px; border-radius: 10px; font-size: 10px; font-weight: 700; }
+    .ch-active    { background:#d4edda; color:#155724; }
+    .ch-removed   { background:#f8d7da; color:#721c24; }
+    .ch-pending   { background:#fff3cd; color:#856404; }
+    .ch-paid      { background:#d1ecf1; color:#0c5460; }
+    .ch-eligible  { background:#d4edda; color:#155724; }
+    .ch-pass      { background:#cce5ff; color:#004085; }
+
+    /* Page sections toggle */
+    .portal-section { display: none; }
+    .portal-section.active { display: block; }
+
+    /* Login page */
+    #page-login {
+      display: flex; align-items: center; justify-content: center;
+      min-height: 100vh; background: #1a2744;
+    }
+    .login-box {
+      background: #fff; border-radius: 5px;
+      padding: 38px 34px; width: 360px; max-width: 100%;
+      box-shadow: 0 20px 60px rgba(0,0,0,.35);
+    }
+    .login-logo { text-align: center; font-size: 22px; font-weight: 900; color: #1a2744; margin-bottom: 4px; }
+    .login-logo span { color: #f4a823; }
+    .login-sub { text-align: center; font-size: 12px; color: #6c757d; margin-bottom: 24px; }
+
+    @media (max-width: 768px) {
+      .ledger-id-grid { grid-template-columns: repeat(2,1fr); }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ══════════════════════════════════════════════════════
+     LOGIN
+══════════════════════════════════════════════════════ -->
+<div id="page-login">
+  <div class="login-box">
+    <div class="login-logo">DNC <span>CHITS</span></div>
+    <div class="login-sub">Agent Portal — Sign in to continue</div>
+
+    <div class="form-group">
+      <label class="font-size-sm font-w600 text-muted text-uppercase">Email / Agent Code</label>
+      <div class="input-group input-group-sm">
+        <div class="input-group-prepend"><span class="input-group-text"><i class="fa fa-user"></i></span></div>
+        <input type="email" class="form-control" value="ravi.kumar@dncchits.com">
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="font-size-sm font-w600 text-muted text-uppercase">Password</label>
+      <div class="input-group input-group-sm">
+        <div class="input-group-prepend"><span class="input-group-text"><i class="fa fa-lock"></i></span></div>
+        <input type="password" class="form-control" value="password">
+      </div>
+    </div>
+    <button class="btn btn-primary btn-block font-w600 mt-2" onclick="enterPortal()">
+      <i class="fa fa-sign-in-alt mr-1"></i> Sign In
+    </button>
+    <div class="text-center mt-3">
+      <small class="text-muted">Forgot password? <a href="#">Contact your branch</a></small>
+    </div>
+  </div>
+</div>
+
+
+<!-- ══════════════════════════════════════════════════════
+     AGENT PORTAL
+══════════════════════════════════════════════════════ -->
+<div id="page-portal" style="display:none">
+<div id="page-container" class="sidebar-o sidebar-dark enable-page-overlay side-scroll side-trans-enabled main-content-boxed">
+
+  <aside id="side-overlay"></aside>
+
+  <!-- ── SIDEBAR ──────────────────────────────────────── -->
+  <nav id="sidebar" aria-label="Main Navigation">
+    <!-- Side Header -->
+    <div class="content-header bg-light">
+      <a class="font-w600 text-dual" href="javascript:void(0)">
+        <span class="smini-hide">
+          <span class="font-w700 font-size-h5 text-dark">DNC CHITS</span>
+        </span>
+      </a>
+    </div>
+
+    <!-- Agent Info -->
+    <div class="content-header bg-white" style="border-bottom:1px solid #e4e7ed;flex-direction:column;align-items:flex-start;padding:12px 20px">
+      <div class="font-size-sm text-uppercase text-muted font-w600">Agent Portal</div>
+      <div class="font-w700 text-dark">Ravi Kumar</div>
+      <div class="font-size-sm text-muted">STB-AGT-001 · Chennai South</div>
+      <div class="mt-1">
+        <span class="score-star">★★★★★</span>
+        <small class="font-w700 text-success ml-1">4.8 / 5.0</small>
+      </div>
+    </div>
+
+    <!-- Navigation -->
+    <div class="content-side content-side-full">
+      <ul class="nav-main">
+        <li class="nav-main-item">
+          <a class="nav-main-link active" id="nav-dashboard" href="javascript:void(0)" onclick="showSection('dashboard')">
+            <i class="nav-main-link-icon si si-speedometer"></i>
+            <span class="nav-main-link-name">Dashboard</span>
+          </a>
+        </li>
+        <li class="nav-main-item">
+          <a class="nav-main-link" id="nav-introductions" href="javascript:void(0)" onclick="showSection('introductions')">
+            <i class="nav-main-link-icon fa fa-handshake"></i>
+            <span class="nav-main-link-name">My Introductions</span>
+            <span class="badge badge-primary badge-pill">24</span>
+          </a>
+        </li>
+        <li class="nav-main-item">
+          <a class="nav-main-link" id="nav-commission" href="javascript:void(0)" onclick="showSection('commission')">
+            <i class="nav-main-link-icon fa fa-hand-holding-usd"></i>
+            <span class="nav-main-link-name">Commission</span>
+            <span class="badge badge-warning badge-pill">₹860</span>
+          </a>
+        </li>
+        <li class="nav-main-heading">Account</li>
+        <li class="nav-main-item">
+          <a class="nav-main-link" id="nav-profile" href="javascript:void(0)" onclick="showSection('profile')">
+            <i class="nav-main-link-icon fa fa-user-circle"></i>
+            <span class="nav-main-link-name">My Profile</span>
+          </a>
+        </li>
+        <li class="nav-main-item">
+          <a class="nav-main-link" id="nav-bank" href="javascript:void(0)" onclick="showSection('bank')">
+            <i class="nav-main-link-icon fa fa-university"></i>
+            <span class="nav-main-link-name">Bank Accounts</span>
+          </a>
+        </li>
+        <li class="nav-main-item">
+          <a class="nav-main-link text-danger" href="javascript:void(0)" onclick="logout()">
+            <i class="nav-main-link-icon fa fa-sign-out-alt"></i>
+            <span class="nav-main-link-name">Logout</span>
+          </a>
+        </li>
+      </ul>
+    </div>
+  </nav>
+  <!-- END SIDEBAR -->
+
+  <!-- ── NAVBAR ───────────────────────────────────────── -->
+  <header id="page-header">
+    <div class="content-header">
+      <div class="d-flex align-items-center">
+        <button type="button" class="btn btn-sm btn-dual mr-2 d-lg-none" data-toggle="layout" data-action="sidebar_toggle">
+          <i class="fa fa-fw fa-bars"></i>
+        </button>
+        <button type="button" class="btn btn-sm btn-dual mr-2 d-none d-lg-inline-block" data-toggle="layout" data-action="sidebar_mini_toggle">
+          <i class="fa fa-fw fa-ellipsis-v"></i>
+        </button>
+        <h1 class="font-w600 text-dark mb-0 font-size-h5 d-none d-sm-block" id="page-title">Dashboard</h1>
+      </div>
+      <div class="d-flex align-items-center">
+        <span class="text-muted font-size-sm d-none d-md-inline mr-3">Chennai South Branch</span>
+        <!-- User dropdown -->
+        <div class="dropdown d-inline-block ml-2">
+          <button type="button" class="btn btn-sm btn-dual" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+            <img class="rounded-circle" src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='32' height='32'><rect width='32' height='32' rx='16' fill='%231a2744'/><text x='50%' y='50%' dominant-baseline='central' text-anchor='middle' fill='white' font-size='12' font-weight='700' font-family='Arial'>RK</text></svg>" alt="RK" width="32" height="32">
+          </button>
+          <div class="dropdown-menu dropdown-menu-right p-0 border-0 font-size-sm">
+            <div class="p-3 bg-primary-dark rounded-top text-center">
+              <p class="mb-1 text-white font-w600">Ravi Kumar</p>
+              <p class="mb-0 text-white-75 font-size-sm">ravi.kumar@dncchits.com</p>
+              <p class="mb-0 text-white-50 font-size-xs">STB-AGT-001</p>
+            </div>
+            <a class="dropdown-item" href="javascript:void(0)" onclick="showSection('profile')"><i class="fa fa-user-circle mr-2 text-primary"></i>My Profile</a>
+            <a class="dropdown-item" href="javascript:void(0)" onclick="showSection('bank')"><i class="fa fa-university mr-2 text-info"></i>Bank Accounts</a>
+            <div class="dropdown-divider"></div>
+            <a class="dropdown-item text-danger" href="javascript:void(0)" onclick="logout()"><i class="fa fa-sign-out-alt mr-2"></i>Sign Out</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </header>
+  <!-- END NAVBAR -->
+
+  <!-- ── MAIN CONTAINER ───────────────────────────────── -->
+  <main id="main-container">
+
+    <!-- ════════════════════════════════════════════════
+         DASHBOARD
+    ════════════════════════════════════════════════ -->
+    <div id="section-dashboard" class="portal-section active">
+
+      <div class="bg-primary-dark">
+        <div class="content pt-5 pb-4">
+          <h2 class="h3 font-w400 mt-0 mb-1 text-white">
+            Welcome back, Ravi Kumar
+            <sup><span class="score-star" style="font-size:16px">★★★★★</span></sup>
+          </h2>
+          <h3 class="h5 font-w400 text-white-75">STB-AGT-001 &nbsp;·&nbsp; Chennai South Branch &nbsp;·&nbsp; Managed by Praveen S.</h3>
+        </div>
+      </div>
+
+      <div class="content">
+
+        <!-- KPI Cards -->
+        <div class="row">
+          <div class="col-6 col-md-3">
+            <div class="block block-rounded block-link-pop border-left border-4x border-success">
+              <div class="block-content block-content-full">
+                <div class="font-size-sm font-w600 text-uppercase text-muted">My Score</div>
+                <div class="font-size-h4 font-w600 text-success">4.8 / 5.0</div>
+              </div>
+            </div>
+          </div>
+          <div class="col-6 col-md-3">
+            <div class="block block-rounded block-link-pop border-left border-4x border-primary">
+              <div class="block-content block-content-full">
+                <div class="font-size-sm font-w600 text-uppercase text-muted">Total Introductions</div>
+                <div class="font-size-h4 font-w600 text-primary">24</div>
+              </div>
+            </div>
+          </div>
+          <div class="col-6 col-md-3">
+            <div class="block block-rounded block-link-pop border-left border-4x border-info">
+              <div class="block-content block-content-full">
+                <div class="font-size-sm font-w600 text-uppercase text-muted">Commission Eligible</div>
+                <div class="font-size-h4 font-w600 text-info">₹3,350</div>
+              </div>
+            </div>
+          </div>
+          <div class="col-6 col-md-3">
+            <div class="block block-rounded block-link-pop border-left border-4x border-warning">
+              <div class="block-content block-content-full">
+                <div class="font-size-sm font-w600 text-uppercase text-muted">Pending Disbursement</div>
+                <div class="font-size-h4 font-w600 text-warning">₹860</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Commission Summary -->
+        <div class="row mb-3">
+          <div class="col-md-4 mb-2"><div class="comm-card"><span class="cv text-info">₹3,350</span><span class="cl">Total Eligible</span></div></div>
+          <div class="col-md-4 mb-2"><div class="comm-card"><span class="cv text-success">₹2,490</span><span class="cl">Total Disbursed</span></div></div>
+          <div class="col-md-4 mb-2"><div class="comm-card"><span class="cv text-warning">₹860</span><span class="cl">Pending Disbursement</span></div></div>
+        </div>
+
+        <!-- Recent Introductions -->
+        <div class="block block-rounded block-bordered">
+          <div class="block-header block-header-default">
+            <h3 class="block-title"><i class="fa fa-handshake mr-2 text-primary"></i>Recent Introductions</h3>
+            <div class="block-options">
+              <button class="btn btn-sm btn-primary" onclick="showSection('introductions')">View All</button>
+            </div>
+          </div>
+          <div class="block-content p-0">
+            <div class="table-responsive">
+              <table class="table table-sm table-striped table-vcenter mb-0">
+                <thead class="thead-dark text-center">
+                  <tr>
+                    <th class="text-left">Subscriber</th>
+                    <th class="text-left">Enrollment</th>
+                    <th>Status</th>
+                    <th>Prize</th>
+                    <th class="text-right">TBC</th>
+                    <th class="text-right text-info">Commission</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td class="font-w600">Ram</td><td>PRR/25L/4 (25) #3</td>
+                    <td class="text-center"><span class="ch ch-active">Active</span></td>
+                    <td class="text-center">—</td>
+                    <td class="text-right">₹23,450</td>
+                    <td class="text-right table-info">₹760</td>
+                  </tr>
+                  <tr>
+                    <td class="font-w600">Leela</td><td>PRR/25L/4 (25) #4</td>
+                    <td class="text-center"><span class="ch ch-removed">Removed</span></td>
+                    <td class="text-center">—</td>
+                    <td class="text-right">—</td>
+                    <td class="text-right table-info">₹320</td>
+                  </tr>
+                  <tr>
+                    <td class="font-w600">Rani</td><td>PRR/25L/4 (25) #5</td>
+                    <td class="text-center"><span class="ch ch-active">Active</span></td>
+                    <td class="text-center">—</td>
+                    <td class="text-right">₹21,200</td>
+                    <td class="text-right table-info">₹680</td>
+                  </tr>
+                  <tr>
+                    <td class="font-w600">Shanmugam</td><td>PRR/25L/4 (25) #7</td>
+                    <td class="text-center"><span class="ch ch-active">Active</span></td>
+                    <td class="text-center"><span class="score-star font-w700" style="font-size:11px">🏆 #8</span></td>
+                    <td class="text-right">₹16,100</td>
+                    <td class="text-right table-info">₹515</td>
+                  </tr>
+                  <tr>
+                    <td class="font-w600">Dinesh</td><td>PRR/25L/4 (25) #8</td>
+                    <td class="text-center"><span class="ch ch-active">Active</span></td>
+                    <td class="text-center">—</td>
+                    <td class="text-right">₹14,800</td>
+                    <td class="text-right table-info">₹475</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- Performance -->
+        <div class="block block-rounded block-bordered">
+          <div class="block-header block-header-default">
+            <h3 class="block-title"><i class="fa fa-chart-line mr-2 text-success"></i>My Performance</h3>
+          </div>
+          <div class="block-content">
+            <div class="row text-center">
+              <div class="col-md-4 border-right py-2">
+                <div class="font-size-h4 font-w600 text-success">Good</div>
+                <div class="font-size-sm text-muted text-uppercase">Avg Enrollment Score</div>
+              </div>
+              <div class="col-md-4 border-right py-2">
+                <div class="font-size-h4 font-w600 text-success">Good</div>
+                <div class="font-size-sm text-muted text-uppercase">Introductions (6 months)</div>
+              </div>
+              <div class="col-md-4 py-2">
+                <div class="font-size-h4 font-w600" style="color:#f4a823">Elite</div>
+                <div class="font-size-sm text-muted text-uppercase">Agent Tier</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+    <!-- END DASHBOARD -->
+
+
+    <!-- ════════════════════════════════════════════════
+         MY INTRODUCTIONS (LEDGER)
+    ════════════════════════════════════════════════ -->
+    <div id="section-introductions" class="portal-section">
+
+      <div class="bg-primary-dark">
+        <div class="content pt-5 pb-4">
+          <h2 class="h3 font-w400 mt-0 mb-1 text-white"><i class="fa fa-handshake mr-2"></i>My Introductions</h2>
+          <h3 class="h5 font-w400 text-white-75">Enrollments I have introduced — 24 total</h3>
+        </div>
+      </div>
+
+      <div class="content">
+
+        <!-- Persistent Ledger Header -->
+        <div class="ledger-band">
+          <div class="ledger-band-title">
+            Employee / Agent Details
+            <small style="color:rgba(255,255,255,.5);font-weight:400;font-size:11px">* Displayed on all pages</small>
+          </div>
+          <div class="ledger-id-grid">
+            <div class="ledger-id-cell"><div class="ledger-id-label">Emp ID</div><div class="ledger-id-val">EMP-00142</div></div>
+            <div class="ledger-id-cell"><div class="ledger-id-label">Employee Name</div><div class="ledger-id-val">Ravi Kumar</div></div>
+            <div class="ledger-id-cell"><div class="ledger-id-label">Employee Code</div><div class="ledger-id-val">STB-AGT-001</div></div>
+            <div class="ledger-id-cell"><div class="ledger-id-label">Branch Name</div><div class="ledger-id-val">Chennai South</div></div>
+          </div>
+          <div class="ledger-id-grid" style="border-bottom:1px solid #e4e7ed">
+            <div class="ledger-id-cell"><div class="ledger-id-label">Mobile No</div><div class="ledger-id-val">98765 43210</div></div>
+            <div class="ledger-id-cell"><div class="ledger-id-label">PAN No</div><div class="ledger-id-val">ABCDE1234F</div></div>
+            <div class="ledger-id-cell"><div class="ledger-id-label">WhatsApp No</div><div class="ledger-id-val">98765 43210</div></div>
+            <div class="ledger-id-cell"><div class="ledger-id-label">DOB</div><div class="ledger-id-val">12-Mar-1985</div></div>
+          </div>
+          <div class="table-responsive">
+            <table class="kpi-band-table">
+              <thead>
+                <tr>
+                  <th>Agent Score</th><th>Active Enrollments</th><th>Removed Enrollments</th>
+                  <th>Closed Enrollments</th><th>Prized</th><th>Non Prized</th>
+                  <th>TBC</th><th>TBC (abv 60 days)</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><span class="kv gold">4.8</span></td>
+                  <td><span class="kv gr">₹28,50,000</span><span class="ks">(12 Nos)</span></td>
+                  <td><span class="kv">₹5,00,000</span><span class="ks">(2 Nos)</span></td>
+                  <td><span class="kv">₹12,50,000</span><span class="ks">(5 Nos)</span></td>
+                  <td><span class="kv gr">₹10,00,000</span><span class="ks">(4 Nos)</span></td>
+                  <td><span class="kv">₹18,50,000</span><span class="ks">(8 Nos)</span></td>
+                  <td><span class="kv gold">₹23,450</span><span class="ks">(2 Nos)</span></td>
+                  <td><span class="kv rd">₹23,450</span><span class="ks">(2 Nos)</span></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <div class="table-responsive">
+            <table class="kpi-band-table">
+              <thead>
+                <tr>
+                  <th colspan="4" class="band-blue">Own — Active Tkt</th>
+                  <th colspan="4" class="band-grn">Guarantor — Active Tkt</th>
+                </tr>
+                <tr>
+                  <th class="band-blue2">Chit Value (Nos)</th><th class="band-blue2">Prized TBC</th>
+                  <th class="band-blue2">Non Prized TBC</th><th class="band-blue2">FL</th>
+                  <th class="band-grn2">Chit Value (Nos)</th><th class="band-grn2">Prized TBC</th>
+                  <th class="band-grn2">Non Prized TBC</th><th class="band-grn2">FL</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>₹28,50,000 (12)</td><td>₹23,450 (5)</td><td>₹23,450 (5)</td><td>₹23,450 (5)</td>
+                  <td>₹15,00,000 (6)</td><td>₹23,450 (5)</td><td>₹23,450 (5)</td><td>₹23,450 (5)</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+        <!-- END Ledger Header -->
+
+        <!-- Enrollment Details LEDGER -->
+        <div class="block block-rounded block-bordered">
+          <div class="block-header" style="background:#1a2744">
+            <h3 class="block-title text-white">Enrollment Details (LEDGER)</h3>
+          </div>
+          <div class="block-content p-0">
+            <div class="table-responsive">
+              <table class="table table-sm table-striped table-vcenter text-center mb-0">
+                <thead class="thead-dark">
+                  <tr>
+                    <th>S NO</th>
+                    <th class="text-left" style="min-width:90px">Enrollment No</th>
+                    <th class="text-left" style="min-width:150px">Enrollment Name</th>
+                    <th style="min-width:110px">Subscriber Name</th>
+                    <th style="min-width:95px">Enrollment Date</th>
+                    <th style="min-width:85px">Enr. Status</th>
+                    <th style="min-width:80px">Prized Status</th>
+                    <th style="min-width:70px">TBC</th>
+                    <th style="min-width:90px">Avg Days (Coll)</th>
+                    <th style="min-width:100px">Commission Status</th>
+                    <th style="min-width:110px">Commission Pass/Fail</th>
+                    <th style="min-width:130px">Final Distribution Status</th>
+                    <th style="min-width:110px">Mode of Payment</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr><td>1</td><td class="text-left">135376</td><td class="text-left">PRR/25L/4 (25) #3</td><td>Ram</td><td>21-05-22</td><td><span class="ch ch-active">Active</span></td><td>—</td><td class="text-right">₹23,450</td><td>—</td><td><span class="ch ch-eligible">Eligible</span></td><td><span class="ch ch-pass">Pass</span></td><td><span class="ch ch-paid">Paid</span></td><td>Cash</td></tr>
+                  <tr><td>2</td><td class="text-left">135377</td><td class="text-left">PRR/25L/4 (25) #4</td><td>Leela</td><td>22-05-22</td><td><span class="ch ch-removed">Removed</span></td><td>—</td><td class="text-right">—</td><td>—</td><td><span class="ch ch-eligible">Eligible</span></td><td><span class="ch ch-pass">Pass</span></td><td><span class="ch ch-pending">Not Paid</span></td><td>—</td></tr>
+                  <tr><td>3</td><td class="text-left">135378</td><td class="text-left">PRR/25L/4 (25) #5</td><td>Rani</td><td>23-05-22</td><td><span class="ch ch-active">Active</span></td><td>—</td><td class="text-right">₹21,200</td><td>—</td><td><span class="ch ch-eligible">Eligible</span></td><td><span class="ch ch-pass">Pass</span></td><td><span class="ch ch-paid">Paid</span></td><td>Adjustment</td></tr>
+                  <tr><td>4</td><td class="text-left">135379</td><td class="text-left">PRR/25L/4 (25) #6</td><td>Santhi</td><td>24-05-22</td><td><span class="ch ch-active">Active</span></td><td>—</td><td class="text-right">₹18,750</td><td>—</td><td><span class="ch ch-eligible">Eligible</span></td><td><span class="ch ch-pass">Pass</span></td><td><span class="ch ch-pending">Not Paid</span></td><td>—</td></tr>
+                  <tr><td>5</td><td class="text-left">135380</td><td class="text-left">PRR/25L/4 (25) #7</td><td>Shanmugam</td><td>25-05-22</td><td><span class="ch ch-active">Active</span></td><td><span class="score-star font-w700" style="font-size:11px">🏆 #8</span></td><td class="text-right">₹16,100</td><td>—</td><td><span class="ch ch-eligible">Eligible</span></td><td><span class="ch ch-pass">Pass</span></td><td><span class="ch ch-paid">Paid</span></td><td>Cheque</td></tr>
+                  <tr><td>6</td><td class="text-left">135381</td><td class="text-left">PRR/25L/4 (25) #8</td><td>Dinesh</td><td>26-05-22</td><td><span class="ch ch-active">Active</span></td><td>—</td><td class="text-right">₹14,800</td><td>—</td><td><span class="ch ch-eligible">Eligible</span></td><td><span class="ch ch-pass">Pass</span></td><td><span class="ch ch-pending">Not Paid</span></td><td>—</td></tr>
+                  <tr><td>7</td><td class="text-left">135382</td><td class="text-left">PRR/25L/4 (25) #9</td><td>Suresh</td><td>27-05-22</td><td><span class="ch ch-active">Active</span></td><td>—</td><td class="text-right">₹12,500</td><td>—</td><td><span class="ch ch-eligible">Eligible</span></td><td><span class="ch ch-pass">Pass</span></td><td><span class="ch ch-paid">Paid</span></td><td>Neft</td></tr>
+                  <tr><td>8</td><td class="text-left">135383</td><td class="text-left">PRR/25L/4 (25) #10</td><td>Mahesh</td><td>28-05-22</td><td><span class="ch ch-active">Active</span></td><td>—</td><td class="text-right">₹10,800</td><td>—</td><td><span class="ch ch-eligible">Eligible</span></td><td><span class="ch ch-pass">Pass</span></td><td><span class="ch ch-pending">Not Paid</span></td><td>—</td></tr>
+                  <tr><td>9</td><td class="text-left">135384</td><td class="text-left">PRR/25L/4 (25) #11</td><td>Kumar</td><td>29-05-22</td><td><span class="ch ch-active">Active</span></td><td>—</td><td class="text-right">₹9,400</td><td>—</td><td><span class="ch ch-eligible">Eligible</span></td><td><span class="ch ch-pass">Pass</span></td><td><span class="ch ch-paid">Paid</span></td><td>Cheque, Adj.</td></tr>
+                  <tr><td>10</td><td class="text-left">135385</td><td class="text-left">PRR/25L/4 (25) #12</td><td>Bala</td><td>30-05-22</td><td><span class="ch ch-removed">Removed</span></td><td>—</td><td class="text-right">—</td><td>—</td><td><span class="ch ch-eligible">Eligible</span></td><td><span class="ch ch-pass">Pass</span></td><td><span class="ch ch-pending">Not Paid</span></td><td>—</td></tr>
+                  <tr><td>11</td><td class="text-left">135386</td><td class="text-left">PRR/25L/4 (25) #13</td><td>Raju</td><td>31-05-22</td><td><span class="ch ch-active">Active</span></td><td>—</td><td class="text-right">₹8,100</td><td>—</td><td><span class="ch ch-eligible">Eligible</span></td><td><span class="ch ch-pass">Pass</span></td><td><span class="ch ch-paid">Paid</span></td><td>—</td></tr>
+                  <tr><td>12</td><td class="text-left">135387</td><td class="text-left">PRR/25L/4 (25) #14</td><td>Ravi</td><td>01-06-22</td><td><span class="ch ch-removed">Removed</span></td><td>—</td><td class="text-right">—</td><td>—</td><td><span class="ch ch-eligible">Eligible</span></td><td><span class="ch ch-pass">Pass</span></td><td><span class="ch ch-pending">Not Paid</span></td><td>—</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+    <!-- END INTRODUCTIONS -->
+
+
+    <!-- ════════════════════════════════════════════════
+         COMMISSION LEDGER
+    ════════════════════════════════════════════════ -->
+    <div id="section-commission" class="portal-section">
+
+      <div class="bg-primary-dark">
+        <div class="content pt-5 pb-4">
+          <h2 class="h3 font-w400 mt-0 mb-1 text-white"><i class="fa fa-hand-holding-usd mr-2"></i>My Commission</h2>
+          <h3 class="h5 font-w400 text-white-75">Eligibility, disbursement &amp; pending amounts</h3>
+        </div>
+      </div>
+
+      <div class="content">
+
+        <div class="row mb-3">
+          <div class="col-md-4 mb-2"><div class="comm-card"><span class="cv text-info">₹3,350</span><span class="cl">Total Eligible</span></div></div>
+          <div class="col-md-4 mb-2"><div class="comm-card"><span class="cv text-success">₹2,490</span><span class="cl">Total Disbursed</span></div></div>
+          <div class="col-md-4 mb-2"><div class="comm-card"><span class="cv text-warning">₹860</span><span class="cl">Pending Disbursement</span></div></div>
+        </div>
+
+        <!-- Filters -->
+        <div class="filter-bar">
+          <span class="filter-tag">Filters</span>
+          <select class="filter-ctrl"><option>Cluster: All</option><option>Chennai</option><option>Krishnagiri</option></select>
+          <select class="filter-ctrl"><option>Branch: All</option><option>Chennai South</option><option>Porur</option></select>
+          <select class="filter-ctrl"><option>Group: All</option><option>PRR/25L/4 (25)</option></select>
+          <select class="filter-ctrl"><option>Chit Value: All</option><option>₹25,00,000</option></select>
+          <select class="filter-ctrl"><option>Policy: All</option><option>4.5</option></select>
+          <input type="text" class="filter-ctrl" placeholder="1st Auction Date" style="width:120px">
+          <input type="text" class="filter-ctrl" placeholder="Enrolled between" style="width:130px">
+          <input type="text" class="filter-ctrl" placeholder="Group Started between" style="width:145px">
+        </div>
+
+        <!-- Group Details -->
+        <div class="block block-rounded block-bordered mb-3">
+          <div class="block-header" style="background:#1a2744">
+            <h3 class="block-title text-white">Group Details</h3>
+          </div>
+          <div class="table-responsive">
+            <table class="table table-sm table-vcenter mb-0">
+              <thead class="thead-dark">
+                <tr>
+                  <th>Branch Name</th><th>Group Name</th><th>Chit Value</th>
+                  <th class="text-center">Group Count</th><th class="text-center">Removed Count</th>
+                  <th class="text-center">Comm Eligible</th><th class="text-center">Comm Not Eligible</th>
+                  <th class="text-right">Total</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>Porur</td><td class="font-w600">PRR/25L/4 (25)</td><td>₹25,00,000</td>
+                  <td class="text-center">25</td><td class="text-center">0</td>
+                  <td class="text-center"><div class="font-w600 text-success">₹3,350</div><div class="font-size-xs text-muted">(12 Nos)</div></td>
+                  <td class="text-center">—</td>
+                  <td class="text-right font-w700">₹23,450 (5)</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <div class="table-responsive">
+            <table class="table table-sm table-vcenter mb-0" style="border-top:1px solid #e4e7ed">
+              <thead style="background:#f8f9fa">
+                <tr>
+                  <th style="font-size:11px">Comm Eligible Date</th>
+                  <th style="font-size:11px">Comm Eligible Amount</th>
+                  <th style="font-size:11px">Deduction</th>
+                  <th style="font-size:11px">TDS</th>
+                  <th style="font-size:11px">Final Disb</th>
+                  <th style="font-size:11px">Total Disb Comm</th>
+                  <th style="font-size:11px">Total Undisb Comm</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>25-03-2024</td>
+                  <td class="text-right"><div>₹3,350</div><div class="font-size-xs text-muted">(12 Nos)</div></td>
+                  <td class="text-right">₹200</td>
+                  <td class="text-right">₹335</td>
+                  <td class="text-right font-w700 text-success">₹2,815</td>
+                  <td class="text-right font-w700 text-success">₹1,955</td>
+                  <td class="text-right font-w700 text-warning">₹860</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Enrollment Details -->
+        <div class="block block-rounded block-bordered">
+          <div class="block-header" style="background:#1a2744">
+            <h3 class="block-title text-white">Enrollment Details</h3>
+          </div>
+          <div class="block-content p-0">
+            <div class="table-responsive">
+              <table class="table table-sm table-striped table-vcenter text-center mb-0">
+                <thead class="thead-dark">
+                  <tr>
+                    <th>S NO</th>
+                    <th class="text-left" style="min-width:150px">Enrollment Name</th>
+                    <th class="text-left" style="min-width:100px">Subscriber</th>
+                    <th style="min-width:95px">Enrollment Date</th>
+                    <th>Enr. Status</th>
+                    <th>Commission Status</th>
+                    <th>Policy</th>
+                    <th style="min-width:140px">Final Distribution Status</th>
+                    <th style="min-width:110px">Mode of Payment</th>
+                    <th style="min-width:100px">Date of Payment</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr><td>1</td><td class="text-left">PRR/25L/4 (25) #1</td><td class="text-left text-muted font-italic" colspan="7">DNC CHITS PVT LTD</td><td>2024.3.01</td></tr>
+                  <tr><td>2</td><td class="text-left">PRR/25L/4 (25) #2</td><td class="text-left">Ram</td><td>21-05-22</td><td><span class="ch ch-active">Active</span></td><td class="text-success font-w600">Eligible</td><td>4.5</td><td><span class="ch ch-paid">Paid</span></td><td>Cash</td><td>2024.3.02</td></tr>
+                  <tr><td>3</td><td class="text-left">PRR/25L/4 (25) #3</td><td class="text-left">Leela</td><td>22-05-22</td><td><span class="ch ch-active">Active</span></td><td class="text-success font-w600">Eligible</td><td>4.5</td><td><span class="ch ch-pending">Not Paid</span></td><td>—</td><td>2024.3.03</td></tr>
+                  <tr><td>4</td><td class="text-left">PRR/25L/4 (25) #4</td><td class="text-left">Rani</td><td>23-05-22</td><td><span class="ch ch-active">Active</span></td><td class="text-success font-w600">Eligible</td><td>4.5</td><td><span class="ch ch-paid">Paid</span></td><td>Adjustment</td><td>2024.3.04</td></tr>
+                  <tr><td>5</td><td class="text-left">PRR/25L/4 (25) #5</td><td class="text-left">Santhi</td><td>24-05-22</td><td><span class="ch ch-active">Active</span></td><td class="text-success font-w600">Eligible</td><td>4.5</td><td><span class="ch ch-pending">Not Paid</span></td><td>—</td><td>2024.3.05</td></tr>
+                  <tr><td>6</td><td class="text-left">PRR/25L/4 (25) #6</td><td class="text-left">Shanmugam</td><td>25-05-22</td><td><span class="ch ch-active">Active</span></td><td class="text-success font-w600">Eligible</td><td>4.5</td><td><span class="ch ch-paid">Paid</span></td><td>Cheque</td><td>2024.3.06</td></tr>
+                  <tr><td>7</td><td class="text-left">PRR/25L/4 (25) #7</td><td class="text-left">Dinesh</td><td>26-05-22</td><td><span class="ch ch-active">Active</span></td><td class="text-success font-w600">Eligible</td><td>4.5</td><td><span class="ch ch-pending">Not Paid</span></td><td>—</td><td>2024.3.07</td></tr>
+                  <tr><td>8</td><td class="text-left">PRR/25L/4 (25) #8</td><td class="text-left">Suresh</td><td>27-05-22</td><td><span class="ch ch-active">Active</span></td><td class="text-success font-w600">Eligible</td><td>4.5</td><td><span class="ch ch-paid">Paid</span></td><td>Neft</td><td>2024.3.08</td></tr>
+                  <tr><td>9</td><td class="text-left">PRR/25L/4 (25) #9</td><td class="text-left">Mahesh</td><td>28-05-22</td><td><span class="ch ch-active">Active</span></td><td class="text-success font-w600">Eligible</td><td>4.5</td><td><span class="ch ch-pending">Not Paid</span></td><td>—</td><td>2024.3.09</td></tr>
+                  <tr><td>10</td><td class="text-left">PRR/25L/4 (25) #10</td><td class="text-left">Kumar</td><td>29-05-22</td><td><span class="ch ch-active">Active</span></td><td class="text-success font-w600">Eligible</td><td>4.5</td><td><span class="ch ch-paid">Paid</span></td><td>Cheque, Adj.</td><td>2024.3.10</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+    <!-- END COMMISSION -->
+
+
+    <!-- ════════════════════════════════════════════════
+         MY PROFILE
+    ════════════════════════════════════════════════ -->
+    <div id="section-profile" class="portal-section">
+      <div class="bg-primary-dark">
+        <div class="content pt-5 pb-4">
+          <h2 class="h3 font-w400 mt-0 mb-1 text-white"><i class="fa fa-user-circle mr-2"></i>My Profile</h2>
+          <h3 class="h5 font-w400 text-white-75">Personal details &amp; KYC information</h3>
+        </div>
+      </div>
+      <div class="content">
+        <div class="row">
+          <div class="col-md-6">
+            <div class="block block-rounded block-bordered">
+              <div class="block-header block-header-default"><h3 class="block-title">Personal Information</h3></div>
+              <div class="block-content">
+                <table class="table table-sm table-vcenter">
+                  <tbody>
+                    <tr><th class="text-muted font-w400" width="38%">Name</th><td class="font-w600">Ravi Kumar</td></tr>
+                    <tr><th class="text-muted font-w400">Agent Code</th><td>STB-AGT-001</td></tr>
+                    <tr><th class="text-muted font-w400">Gender</th><td>Male</td></tr>
+                    <tr><th class="text-muted font-w400">Date of Birth</th><td>12-Mar-1985</td></tr>
+                    <tr><th class="text-muted font-w400">Mobile (Primary)</th><td>98765 43210</td></tr>
+                    <tr><th class="text-muted font-w400">WhatsApp</th><td>98765 43210</td></tr>
+                    <tr><th class="text-muted font-w400">Email</th><td>ravi.kumar@dncchits.com</td></tr>
+                    <tr><th class="text-muted font-w400">Date of Joining</th><td>05-01-2022</td></tr>
+                    <tr><th class="text-muted font-w400">Branch</th><td>Chennai South</td></tr>
+                    <tr><th class="text-muted font-w400">Managing Employee</th><td>Praveen S.</td></tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-6">
+            <div class="block block-rounded block-bordered">
+              <div class="block-header block-header-default"><h3 class="block-title">KYC &amp; Financial Details</h3></div>
+              <div class="block-content">
+                <table class="table table-sm table-vcenter">
+                  <tbody>
+                    <tr><th class="text-muted font-w400" width="38%">PAN No</th><td>ABCDE1234F</td></tr>
+                    <tr><th class="text-muted font-w400">Aadhaar No</th><td>9876 5432 1000</td></tr>
+                    <tr><th class="text-muted font-w400">GST No</th><td>—</td></tr>
+                    <tr><th class="text-muted font-w400">Father Name</th><td>Kannan</td></tr>
+                    <tr><th class="text-muted font-w400">Mother Name</th><td>Vasantha</td></tr>
+                    <tr><th class="text-muted font-w400">Spouse Name</th><td>Kavitha</td></tr>
+                    <tr><th class="text-muted font-w400">Monthly Income</th><td>₹35,000</td></tr>
+                    <tr><th class="text-muted font-w400">Source of Income</th><td>Business</td></tr>
+                    <tr><th class="text-muted font-w400">Present Address</th><td>14/5, Anna Nagar, Chennai - 600040</td></tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+
+    <!-- ════════════════════════════════════════════════
+         BANK ACCOUNTS
+    ════════════════════════════════════════════════ -->
+    <div id="section-bank" class="portal-section">
+      <div class="bg-primary-dark">
+        <div class="content pt-5 pb-4">
+          <h2 class="h3 font-w400 mt-0 mb-1 text-white"><i class="fa fa-university mr-2"></i>My Bank Accounts</h2>
+          <h3 class="h5 font-w400 text-white-75">Accounts registered for commission disbursement</h3>
+        </div>
+      </div>
+      <div class="content">
+        <div class="block block-rounded block-bordered">
+          <div class="block-header block-header-default">
+            <h3 class="block-title">Bank Account Details</h3>
+            <div class="block-options">
+              <button class="btn btn-sm btn-primary"><i class="fa fa-plus mr-1"></i>Add Bank Details</button>
+            </div>
+          </div>
+          <div class="block-content p-0">
+            <div class="table-responsive">
+              <table class="table table-sm table-striped table-vcenter mb-0">
+                <thead class="thead-dark text-center">
+                  <tr>
+                    <th>S No</th><th class="text-left">Bank Name</th><th>Account No</th>
+                    <th>IFSC Code</th><th>Branch</th><th>Status</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td class="text-center">1</td>
+                    <td><i class="fa fa-university mr-2 text-primary"></i><strong>HDFC Bank</strong></td>
+                    <td class="text-center">255225678532</td><td class="text-center">HDF0052</td>
+                    <td class="text-center">Ashok Nagar</td>
+                    <td class="text-center"><span class="badge badge-success">Active</span></td>
+                  </tr>
+                  <tr>
+                    <td class="text-center">2</td>
+                    <td><i class="fa fa-university mr-2 text-secondary"></i><strong>ICICI Bank</strong></td>
+                    <td class="text-center">268623652365</td><td class="text-center">ICIC0057</td>
+                    <td class="text-center">Anna Nagar</td>
+                    <td class="text-center"><span class="badge badge-danger">Inactive</span></td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+        <div class="alert alert-info font-size-sm">
+          <i class="fa fa-info-circle mr-2"></i>
+          Commission disbursements are transferred to your <strong>Active</strong> bank account. Contact your branch manager to change your active account.
+        </div>
+      </div>
+    </div>
+
+  </main>
+  <!-- END MAIN CONTAINER -->
+
+</div>
+</div>
+<!-- END PORTAL -->
+
+<!-- OneUI JS (actual project JS — includes jQuery + Bootstrap) -->
+<script src="./assets/js/oneui.core.min.js"></script>
+<script src="./assets/js/oneui.app.min.js"></script>
+
+<script>
+  var SECTIONS = ['dashboard','introductions','commission','profile','bank'];
+  var TITLES   = {
+    dashboard:'Dashboard', introductions:'My Introductions',
+    commission:'Commission', profile:'My Profile', bank:'Bank Accounts'
+  };
+
+  function enterPortal() {
+    document.getElementById('page-login').style.display  = 'none';
+    document.getElementById('page-portal').style.display = 'block';
+    // Init OneUI after portal is shown
+    if (typeof App !== 'undefined') { App.init(); }
+  }
+
+  function logout() {
+    document.getElementById('page-portal').style.display = 'none';
+    document.getElementById('page-login').style.display  = 'flex';
+  }
+
+  function showSection(name) {
+    SECTIONS.forEach(function(s) {
+      document.getElementById('section-' + s).style.display = 'none';
+      document.getElementById('section-' + s).classList.remove('active');
+      var n = document.getElementById('nav-' + s);
+      if (n) n.classList.remove('active');
+    });
+    document.getElementById('section-' + name).style.display = 'block';
+    document.getElementById('section-' + name).classList.add('active');
+    var nav = document.getElementById('nav-' + name);
+    if (nav) nav.classList.add('active');
+    document.getElementById('page-title').textContent = TITLES[name] || name;
+    window.scrollTo(0, 0);
+  }
+</script>
+</body>
+</html>
