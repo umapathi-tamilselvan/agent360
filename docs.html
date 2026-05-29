@@ -2553,7 +2553,7 @@
                 <tr><td>TBC</td><td>Calculated</td><td>Total Balance Chit (outstanding)</td></tr>
                 <tr><td>Avg Days (Coll)</td><td>Calculated</td><td>Average days to collect installment</td></tr>
                 <tr><td>Commission Status</td><td>transactions</td><td>Eligible / Not Eligible</td></tr>
-                <tr><td>Commission Pass/Fail</td><td>Eligibility engine</td><td>Pass / Fail based on cluster rules</td></tr>
+                <tr style="background:#fff8f0"><td>Commission Pass/Fail</td><td><code>canDisburseIntroducerCommission()</code></td><td><strong>Pass</strong> — group has ≥ 2 auctions &amp; installments 1–2 TBC = nil &amp; introducer not locked<br><strong>Fail</strong> — any condition unmet; commission carry-forwarded</td></tr>
                 <tr><td>Final Distribution Status</td><td>transactions</td><td>Paid / Not Paid</td></tr>
                 <tr><td>Mode of Payment</td><td>transactions.mode</td><td>Cash / Cheque / Neft / Adjustment</td></tr>
               </tbody>
@@ -2664,15 +2664,23 @@
             <div class="step-desc">Commission sits in agent commission account</div>
           </div>
           <div class="workflow-step">
+            <div class="step-circle" style="background:linear-gradient(135deg,#f4a823,#f9c74f);color:#78350f">✓?</div>
+            <div class="step-title">Eligibility Check</div>
+            <div class="step-desc">≥ 2 auctions done &amp; installments 1–2 TBC = nil. Carry-forward if not met.</div>
+          </div>
+          <div class="workflow-step">
             <div class="step-circle" style="background:linear-gradient(135deg,#22c55e,#4ade80)">4</div>
             <div class="step-title">Disbursement</div>
-            <div class="step-desc">Transfer to agent's bank (blocked if locked)</div>
+            <div class="step-desc">Transfer to agent's bank (blocked if locked or TBC flag set)</div>
           </div>
           <div class="workflow-step">
             <div class="step-circle" style="background:linear-gradient(135deg,#ef4444,#f87171)">R</div>
             <div class="step-title">Refund (if)</div>
             <div class="step-desc">If enrollment removed, commission returned</div>
           </div>
+        </div>
+        <div class="info-banner" style="margin-top:16px;margin-bottom:0">
+          <strong>Eligibility rule:</strong> Disbursement is only triggered after (a) the group has run ≥ 2 auctions <em>and</em> (b) the subscriber's installments 1 &amp; 2 are fully settled with nil TBC. If TBC &gt; 0 on either installment, commission is <strong>carry-forwarded</strong> to the following month's disbursement run.
         </div>
       </div>
 
@@ -3066,12 +3074,91 @@ Rural      → <span class="num">0.5</span> introductions
         <div class="feature-card">
           <span class="feature-icon">💳</span>
           <h3>Disbursement</h3>
-          <p>Commission transferred from agent account to bank account. Blocked if <code>is_locked = true</code>. Triggers transaction with purpose <code>INTRODUCER_COMMISSION_DISBURSEMENT</code>.</p>
+          <p>Commission transferred from agent account to bank account. Requires eligibility check (<code>canDisburseIntroducerCommission()</code>) to pass. Blocked if <code>is_locked = true</code>. Triggers transaction with purpose <code>INTRODUCER_COMMISSION_DISBURSEMENT</code>.</p>
         </div>
         <div class="feature-card red">
           <span class="feature-icon">↩️</span>
           <h3>Refund</h3>
           <p>If an enrollment is removed, the allocated-but-undisbursed commission is refunded back using purpose <code>INTRODUCER_COMMISSION_REFUND</code>.</p>
+        </div>
+      </div>
+
+      <!-- Disbursement Eligibility Rules -->
+      <div class="warn-banner" style="margin-top:16px">
+        <strong>⚠️ Disbursement Eligibility — All conditions must pass before commission can be paid out.</strong><br>
+        Defined in <code>Enrollment::canDisburseIntroducerCommission()</code> and enforced by <code>IntroducerCommissionDisbursementPolicy</code>.
+      </div>
+
+      <div class="card" style="margin-top:0">
+        <h3 style="font-size:14px;font-weight:800;color:var(--primary);margin-bottom:14px">Disbursement Eligibility Conditions</h3>
+        <div class="table-wrap" style="margin:0">
+          <table>
+            <thead><tr><th>#</th><th>Condition</th><th>Code Check</th><th>Fail Behaviour</th></tr></thead>
+            <tbody>
+              <tr>
+                <td><strong>1</strong></td>
+                <td><strong>2 completed auctions</strong> must exist in the group</td>
+                <td><code>group.auctions.count() &gt;= 2</code></td>
+                <td>Disbursement blocked — not yet eligible</td>
+              </tr>
+              <tr style="background:#fff8f0">
+                <td><strong>2</strong></td>
+                <td><strong>Installments 1 &amp; 2 fully paid (nil TBC)</strong> — the first 2 installments must have zero outstanding settlement amount</td>
+                <td>
+                  <em>Active enrollment:</em><br>
+                  <code>installments.where('installment_no', '&lt;=', 2)<br>.settlements.sum('to_be_settled_amount') == 0</code><br><br>
+                  <em>Removed enrollment:</em><br>
+                  <code>collected_amount &gt;= auctions[1..2].sum('installment_amount')</code>
+                </td>
+                <td>Disbursement blocked — commission carry-forwarded to next eligible month</td>
+              </tr>
+              <tr>
+                <td><strong>3</strong></td>
+                <td><strong>Introducer not locked</strong></td>
+                <td><code>introducer.is_locked == false</code></td>
+                <td>Exception thrown — commission stays allocated</td>
+              </tr>
+              <tr>
+                <td><strong>4</strong></td>
+                <td><strong>Enrollment TBC = 0</strong> <em>(feature-flagged)</em><br>Only enforced when <code>INTRODUCER_COMMISSION_DISBURSEMENT_WHEN_TBC=true</code></td>
+                <td><code>enrollment.to_be_collected_amount == 0</code></td>
+                <td>Exception thrown — commission stays allocated until full collection</td>
+              </tr>
+              <tr>
+                <td><strong>5</strong></td>
+                <td><strong>Enrollment not removed</strong> (policy gate)</td>
+                <td><code>enrollment.status != 'removed'</code></td>
+                <td>Policy denies disbursement</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div style="margin-top:16px">
+          <h4 style="font-size:13px;font-weight:700;color:var(--primary);margin-bottom:10px">Eligibility Logic (from <code>Enrollment.php</code>)</h4>
+          <pre style="margin:0;font-size:12px"><span class="kw">public function</span> <span class="fn">canDisburseIntroducerCommission</span>() {
+
+  <span class="cm">// Gate 1: group must have run at least 2 auctions</span>
+  $are_required_auctions_complete =
+      $this->group->auctions->count() >= <span class="num">2</span>;
+
+  <span class="cm">// Gate 2: first 2 installments must be fully settled (nil TBC)</span>
+  <span class="kw">if</span> ($this->status == self::$STATUS_ACTIVE) {
+    $ok = ($this->installments
+              ->where(<span class="str">'installment_no'</span>, <span class="str">'&lt;='</span>, <span class="num">2</span>)
+              ->pluck(<span class="str">'settlements'</span>)
+              ->flatten()
+              ->sum(<span class="str">'to_be_settled_amount'</span>) == <span class="num">0</span>);
+  } <span class="kw">else</span> {
+    <span class="cm">// Removed enrollment: compare collected vs required</span>
+    $installment_amount = $this->group->auctions
+              ->where(<span class="str">'installment_no'</span>, <span class="str">'&lt;='</span>, <span class="num">2</span>)
+              ->sum(<span class="str">'installment_amount'</span>);
+    $ok = $this->collected_amount >= $installment_amount;
+  }
+
+  <span class="kw">return</span> $are_required_auctions_complete && $ok;
+}</pre>
         </div>
       </div>
 
@@ -3422,7 +3509,17 @@ Rural      → <span class="num">0.5</span> introductions
             </div>
             <div class="dfd-subtitle">Ledger entry</div>
           </div>
-          <div class="dfd-conn"><div class="dfd-conn-label">when disbursed</div><div class="dfd-arr">▶</div></div>
+          <div class="dfd-conn"><div class="dfd-conn-label">disbursement run</div><div class="dfd-arr">▶</div></div>
+
+          <div class="dfd-tier">
+            <div class="dfd-box gold-box">
+              <h4>Eligibility Gate</h4>
+              <p>≥ 2 auctions done <em>and</em> installments 1 &amp; 2 <code>to_be_settled = 0</code>. Carry-forward if not met.</p>
+            </div>
+            <div class="dfd-subtitle">canDisburse() check</div>
+          </div>
+
+          <div class="dfd-conn"><div class="dfd-conn-label">eligible</div><div class="dfd-arr">▶</div></div>
 
           <div class="dfd-tier">
             <div class="dfd-box gold-box">
@@ -3645,30 +3742,72 @@ Rural      → <span class="num">0.5</span> introductions
               <div class="fc-node process-green">Create ALLOCATION<br>transaction</div>
               <div class="fc-arr-d">↓</div>
 
-              <div style="font-size:12px;font-weight:700;color:var(--primary);margin:8px 0">— Disbursement Request —</div>
+              <div style="font-size:12px;font-weight:700;color:var(--primary);margin:8px 0">— Disbursement Eligibility Check —</div>
 
-              <!-- Decision: Is Locked -->
+              <!-- Decision: 2 auctions complete? -->
               <div class="fc-diamond-wrap">
-                <div class="fc-diamond red-d"></div>
-                <div class="fc-diamond-label red-lbl">Agent<br>Locked?</div>
+                <div class="fc-diamond"></div>
+                <div class="fc-diamond-label">Group ≥ 2<br>Auctions done?</div>
               </div>
 
               <div style="display:flex;align-items:flex-start;gap:60px;margin-top:0">
                 <div style="display:flex;flex-direction:column;align-items:center">
-                  <div class="fc-yes-label" style="background:#fef2f2;color:#991b1b">Yes</div>
+                  <div class="fc-no-label">No</div>
                   <div class="fc-arr-d">↓</div>
-                  <div class="fc-node process" style="background:#fef2f2;border-color:#ef4444;color:#991b1b">Block disbursement<br>Show lock reason</div>
+                  <div class="fc-node process-gold">Carry-forward<br>to next month</div>
                   <div class="fc-arr-d">↓</div>
-                  <div class="fc-node end-red">Blocked 🔒</div>
+                  <div class="fc-node end-red">Not yet eligible</div>
                 </div>
                 <div style="display:flex;flex-direction:column;align-items:center">
-                  <div class="fc-no-label" style="background:#dcfce7;color:#166534">No</div>
+                  <div class="fc-yes-label">Yes</div>
                   <div class="fc-arr-d">↓</div>
-                  <div class="fc-node process-green">Create DISBURSEMENT<br>transaction</div>
-                  <div class="fc-arr-d">↓</div>
-                  <div class="fc-node process-green">Transfer to<br>bank account</div>
-                  <div class="fc-arr-d">↓</div>
-                  <div class="fc-node end">Disbursed ✓</div>
+
+                  <!-- Decision: Installments 1 & 2 TBC = nil? -->
+                  <div class="fc-diamond-wrap">
+                    <div class="fc-diamond"></div>
+                    <div class="fc-diamond-label">Installments 1&amp;2<br>TBC = nil?</div>
+                  </div>
+
+                  <div style="display:flex;align-items:flex-start;gap:48px;margin-top:0">
+                    <div style="display:flex;flex-direction:column;align-items:center">
+                      <div class="fc-no-label">No (TBC &gt; 0)</div>
+                      <div class="fc-arr-d">↓</div>
+                      <div class="fc-node process-gold">Carry-forward<br>to next month</div>
+                      <div class="fc-arr-d">↓</div>
+                      <div class="fc-node end-red">Blocked — TBC</div>
+                    </div>
+                    <div style="display:flex;flex-direction:column;align-items:center">
+                      <div class="fc-yes-label">Yes</div>
+                      <div class="fc-arr-d">↓</div>
+
+                      <div style="font-size:12px;font-weight:700;color:var(--primary);margin:8px 0">— Disbursement Request —</div>
+
+                      <!-- Decision: Is Locked -->
+                      <div class="fc-diamond-wrap">
+                        <div class="fc-diamond red-d"></div>
+                        <div class="fc-diamond-label red-lbl">Agent<br>Locked?</div>
+                      </div>
+
+                      <div style="display:flex;align-items:flex-start;gap:48px;margin-top:0">
+                        <div style="display:flex;flex-direction:column;align-items:center">
+                          <div class="fc-yes-label" style="background:#fef2f2;color:#991b1b">Yes</div>
+                          <div class="fc-arr-d">↓</div>
+                          <div class="fc-node process" style="background:#fef2f2;border-color:#ef4444;color:#991b1b">Block disbursement<br>Show lock reason</div>
+                          <div class="fc-arr-d">↓</div>
+                          <div class="fc-node end-red">Blocked 🔒</div>
+                        </div>
+                        <div style="display:flex;flex-direction:column;align-items:center">
+                          <div class="fc-no-label" style="background:#dcfce7;color:#166534">No</div>
+                          <div class="fc-arr-d">↓</div>
+                          <div class="fc-node process-green">Create DISBURSEMENT<br>transaction</div>
+                          <div class="fc-arr-d">↓</div>
+                          <div class="fc-node process-green">Transfer to<br>bank account</div>
+                          <div class="fc-arr-d">↓</div>
+                          <div class="fc-node end">Disbursed ✓</div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
