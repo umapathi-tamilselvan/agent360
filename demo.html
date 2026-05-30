@@ -170,10 +170,11 @@
     <div class="content-header bg-white" style="border-bottom:1px solid #e4e7ed;flex-direction:column;align-items:flex-start;padding:12px 20px">
       <div class="font-size-sm text-uppercase text-muted font-w600">Agent Portal</div>
       <div class="font-w700 text-dark">Ravi Kumar</div>
-      <div class="font-size-sm text-muted">STB-AGT-001 · Chennai South</div>
+      <div class="font-size-sm text-muted">STB-AGT-001 · AGT00142 · Chennai South</div>
       <div class="mt-1">
         <span class="score-star">★★★★★</span>
         <small class="font-w700 text-success ml-1">4.8 / 5.0</small>
+        <span class="ml-2 badge" style="background:#f4a823;color:#1a2744;font-size:10px;font-weight:800">DO</span>
       </div>
     </div>
 
@@ -198,6 +199,13 @@
             <i class="nav-main-link-icon fa fa-hand-holding-usd"></i>
             <span class="nav-main-link-name">Commission</span>
             <span class="badge badge-warning badge-pill">₹860</span>
+          </a>
+        </li>
+        <li class="nav-main-item">
+          <a class="nav-main-link" id="nav-subagents" href="javascript:void(0)" onclick="showSection('subagents')">
+            <i class="nav-main-link-icon fa fa-users"></i>
+            <span class="nav-main-link-name">My Sub-Agents</span>
+            <span class="badge badge-success badge-pill">3</span>
           </a>
         </li>
         <li class="nav-main-heading">Account</li>
@@ -274,7 +282,7 @@
             Welcome back, Ravi Kumar
             <sup><span class="score-star" style="font-size:16px">★★★★★</span></sup>
           </h2>
-          <h3 class="h5 font-w400 text-white-75">STB-AGT-001 &nbsp;·&nbsp; Chennai South Branch &nbsp;·&nbsp; Managed by Praveen S.</h3>
+          <h3 class="h5 font-w400 text-white-75">STB-AGT-001 &nbsp;·&nbsp; AGT00142 &nbsp;·&nbsp; Chennai South Branch &nbsp;·&nbsp; Managed by Praveen S. &nbsp;·&nbsp; <span style="color:#f4a823;font-weight:700">DO</span> (3 Sub-Agents)</h3>
         </div>
       </div>
 
@@ -675,6 +683,109 @@
 
 
     <!-- ════════════════════════════════════════════════
+         MY SUB-AGENTS (DO VIEW)
+    ════════════════════════════════════════════════ -->
+    <div id="section-subagents" class="portal-section">
+
+      <div class="bg-primary-dark">
+        <div class="content pt-5 pb-4">
+          <h2 class="h3 font-w400 mt-0 mb-1 text-white"><i class="fa fa-users mr-2"></i>My Sub-Agents</h2>
+          <h3 class="h5 font-w400 text-white-75">Agents I manage as DO (Development Officer) &nbsp;·&nbsp; <span style="color:#f4a823;font-weight:700">AGT00142</span></h3>
+        </div>
+      </div>
+
+      <div class="content">
+
+        <!-- DO Info Banner -->
+        <div class="alert" style="background:#fef3c7;border:1px solid #f59e0b;color:#92400e;border-radius:4px;padding:12px 16px;margin-bottom:20px">
+          <i class="fa fa-star mr-2" style="color:#f4a823"></i>
+          <strong>You are classified as a DO (Development Officer).</strong> You earn <strong>0.2% commission</strong> on every new ticket introduced by each of your sub-agents.
+        </div>
+
+        <!-- DO Commission Summary -->
+        <div class="row mb-3">
+          <div class="col-md-3 mb-2"><div class="comm-card"><span class="cv text-primary">3</span><span class="cl">Sub-Agents</span></div></div>
+          <div class="col-md-3 mb-2"><div class="comm-card"><span class="cv text-success">₹1,240</span><span class="cl">DO Commission Earned</span></div></div>
+          <div class="col-md-3 mb-2"><div class="comm-card"><span class="cv text-info">42</span><span class="cl">Tickets by Sub-Agents</span></div></div>
+          <div class="col-md-3 mb-2"><div class="comm-card"><span class="cv text-warning">₹320</span><span class="cl">DO Commission Pending</span></div></div>
+        </div>
+
+        <!-- Sub-Agent List -->
+        <div class="block block-rounded block-bordered">
+          <div class="block-header" style="background:#1a2744">
+            <h3 class="block-title text-white"><i class="fa fa-users mr-2"></i>Sub-Agent Details</h3>
+          </div>
+          <div class="block-content p-0">
+            <div class="table-responsive">
+              <table class="table table-sm table-striped table-vcenter text-center mb-0">
+                <thead class="thead-dark">
+                  <tr>
+                    <th>S NO</th>
+                    <th class="text-left" style="min-width:130px">Sub-Agent Name</th>
+                    <th class="text-left">Agent Code</th>
+                    <th class="text-left">Common Code</th>
+                    <th>Branch</th>
+                    <th>Score</th>
+                    <th>Active Enrollments</th>
+                    <th class="text-right">TBC</th>
+                    <th class="text-right text-warning">DO Commission</th>
+                    <th>Status</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>1</td>
+                    <td class="text-left font-w600">Karthik R.</td>
+                    <td class="text-left">STB-AGT-015</td>
+                    <td class="text-left"><span style="color:#3b6ef8;font-family:monospace">AGT00215</span></td>
+                    <td>Chennai South</td>
+                    <td><span class="score-star" style="font-size:11px">★★★★</span> <strong>4.1</strong></td>
+                    <td><strong class="text-success">18</strong></td>
+                    <td class="text-right">₹42,800</td>
+                    <td class="text-right font-w700" style="color:#f4a823">₹540</td>
+                    <td><span class="ch ch-active">Active</span></td>
+                  </tr>
+                  <tr>
+                    <td>2</td>
+                    <td class="text-left font-w600">Meena S.</td>
+                    <td class="text-left">POR-AGT-008</td>
+                    <td class="text-left"><span style="color:#3b6ef8;font-family:monospace">AGT00308</span></td>
+                    <td>Porur</td>
+                    <td><span class="score-star" style="font-size:11px">★★★</span> <strong>3.5</strong></td>
+                    <td><strong class="text-success">14</strong></td>
+                    <td class="text-right">₹28,500</td>
+                    <td class="text-right font-w700" style="color:#f4a823">₹420</td>
+                    <td><span class="ch ch-active">Active</span></td>
+                  </tr>
+                  <tr>
+                    <td>3</td>
+                    <td class="text-left font-w600">Suresh V.</td>
+                    <td class="text-left">AMB-AGT-022</td>
+                    <td class="text-left"><span style="color:#3b6ef8;font-family:monospace">AGT00412</span></td>
+                    <td>Ambattur</td>
+                    <td><span class="score-star" style="font-size:11px">★★★</span> <strong>3.2</strong></td>
+                    <td><strong class="text-success">10</strong></td>
+                    <td class="text-right">₹18,200</td>
+                    <td class="text-right font-w700" style="color:#f4a823">₹280</td>
+                    <td><span class="ch ch-active">Active</span></td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <div class="alert alert-info font-size-sm">
+          <i class="fa fa-info-circle mr-2"></i>
+          As a DO, you earn <strong>0.2% commission</strong> on every new enrollment your sub-agents introduce. This is in addition to your own introductions commission. Contact your branch manager to link more agents under your DO account.
+        </div>
+
+      </div>
+    </div>
+    <!-- END SUB-AGENTS -->
+
+
+    <!-- ════════════════════════════════════════════════
          MY PROFILE
     ════════════════════════════════════════════════ -->
     <div id="section-profile" class="portal-section">
@@ -701,7 +812,9 @@
                     <tr><th class="text-muted font-w400">Email</th><td>ravi.kumar@dncchits.com</td></tr>
                     <tr><th class="text-muted font-w400">Date of Joining</th><td>05-01-2022</td></tr>
                     <tr><th class="text-muted font-w400">Branch</th><td>Chennai South</td></tr>
+                    <tr><th class="text-muted font-w400">Common Code</th><td><span style="font-family:monospace;color:#3b6ef8;font-weight:700">AGT00142</span></td></tr>
                     <tr><th class="text-muted font-w400">Managing Employee</th><td>Praveen S.</td></tr>
+                    <tr><th class="text-muted font-w400">DO Classification</th><td><span class="badge" style="background:#f4a823;color:#1a2744;font-weight:800">DO</span> &nbsp;<small class="text-muted">(3 sub-agents)</small></td></tr>
                   </tbody>
                 </table>
               </div>
@@ -798,10 +911,11 @@
 <script src="./assets/js/oneui.app.min.js"></script>
 
 <script>
-  var SECTIONS = ['dashboard','introductions','commission','profile','bank'];
+  var SECTIONS = ['dashboard','introductions','commission','subagents','profile','bank'];
   var TITLES   = {
     dashboard:'Dashboard', introductions:'My Introductions',
-    commission:'Commission', profile:'My Profile', bank:'Bank Accounts'
+    commission:'Commission', subagents:'My Sub-Agents',
+    profile:'My Profile', bank:'Bank Accounts'
   };
 
   function enterPortal() {

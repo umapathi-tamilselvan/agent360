@@ -1310,6 +1310,7 @@
   <div class="nav-section">
     <div class="nav-section-label">Feature Design</div>
     <a class="nav-item" href="#features"><span>⚡</span> Feature Set</a>
+    <a class="nav-item" href="#subagent"><span>🤝</span> Sub-Agent (DO)</a>
     <a class="nav-item" href="#screens"><span>🖥️</span> Screen Designs</a>
     <a class="nav-item" href="#ledger"><span>📒</span> Ledger Format</a>
     <a class="nav-item" href="#workflows"><span>🔄</span> Workflows</a>
@@ -1658,13 +1659,24 @@
 
         <div class="er-entity er-center">
           <h4>AGENT</h4>
-          <div class="er-fields" style="color:rgba(255,255,255,0.8)">id · agent_code<br>branch_id · employee_id<br>score · is_locked<br>pan · aadhaar · gst</div>
+          <div class="er-fields" style="color:rgba(255,255,255,0.8)">id · agent_code · common_code<br>branch_id · employee_id<br><strong style="color:#f4a823">managing_agent_id · is_do</strong><br>score · is_locked<br>pan · aadhaar · gst</div>
         </div>
 
         <div class="er-connector"><div class="line"></div>N→1<div class="line"></div></div>
         <div class="er-entity">
           <h4>Employee</h4>
           <div class="er-fields">id<br>name<br>role</div>
+        </div>
+      </div>
+
+      <div class="card" style="margin-top:16px;background:#fffbeb;border-color:#f59e0b">
+        <h3 style="font-size:14px;font-weight:800;color:#92400e;margin-bottom:8px">🆕 Sub-Agent (DO) Self-Referential Relationship</h3>
+        <p style="font-size:13px;color:#78350f;margin-bottom:12px">An Agent can now manage other Agents directly via <code>managing_agent_id</code>. An agent with sub-agents is classified as a <strong>DO (Development Officer)</strong>.</p>
+        <div style="background:#1a2744;border-radius:8px;padding:16px;font-family:monospace;font-size:12px;color:#e2e8f0;line-height:1.8">
+          Employee<br>
+          &nbsp;&nbsp;└── Agent 1 (DO) &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;← managing_agent_id = null, is_do = true<br>
+          &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;└── Agent 2 (Sub-Agent) &nbsp;← managing_agent_id = Agent 1<br>
+          &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;└── Agent 3 (Sub-Agent) &nbsp;← managing_agent_id = Agent 1
         </div>
       </div>
 
@@ -1677,6 +1689,8 @@
               <tbody>
                 <tr><td><code>branch()</code></td><td>belongsTo</td><td>Branch</td></tr>
                 <tr><td><code>employee()</code></td><td>belongsTo</td><td>Employee (supervisor)</td></tr>
+                <tr style="background:#fffbeb"><td><code>managingAgent()</code> 🆕</td><td>belongsTo</td><td>Agent (DO parent)</td></tr>
+                <tr style="background:#fffbeb"><td><code>subAgents()</code> 🆕</td><td>hasMany</td><td>Agent (sub-agents this DO manages)</td></tr>
                 <tr><td><code>introductions()</code></td><td>morphMany</td><td>Enrollment (introducer)</td></tr>
                 <tr><td><code>documents()</code></td><td>morphMany</td><td>Document (entity)</td></tr>
                 <tr><td><code>user()</code></td><td>morphOne</td><td>User (portal access)</td></tr>
@@ -1730,14 +1744,19 @@
             <tr><td><code>add_soft_deletes</code></td><td>2023-10-06</td><td>deleted_at</td><td>Soft delete / restore capability</td></tr>
             <tr><td><code>add_date_of_joining</code></td><td>2025-07-03</td><td>date_of_joining</td><td>Track agent onboarding date</td></tr>
             <tr><td><code>add_lock_fields</code></td><td>2025-08-21</td><td>is_locked, lock_message</td><td>Compliance & fraud lock mechanism</td></tr>
-            <tr style="background:#f0fdf4"><td><code>add_agent_tier</code></td><td>Planned</td><td>agent_tier (Bronze/Silver/Gold)</td><td>Tier classification based on cumulative score</td></tr>
-            <tr style="background:#f0fdf4"><td><code>add_target_fields</code></td><td>Planned</td><td>monthly_target, quarterly_target</td><td>Goal-based performance management</td></tr>
+            <tr style="background:#fef9c3"><td><code>add_managing_agent_id</code></td><td>Phase 1</td><td>managing_agent_id (FK → agents), is_do</td><td>Sub-Agent hierarchy — agent managed by another agent (DO Module)</td></tr>
+            <tr style="background:#fef9c3"><td><code>add_common_code</code></td><td>Phase 1</td><td>common_code (unique, AGT00001 format)</td><td>System-wide agent code independent of branch</td></tr>
+            <tr style="background:#fef9c3"><td><code>create_commission_schemes</code></td><td>Phase 3</td><td>New table: cluster_id, percentages, eligibility months</td><td>Configurable cluster-wise commission rules (Chennai/Krishnagiri/Salem)</td></tr>
+            <tr style="background:#fef9c3"><td><code>create_commission_scheme_eligibility_rules</code></td><td>Phase 3</td><td>New table: introducer_type, tenure range, eligibility_months</td><td>Per-cluster, per-introducer-type eligibility conditions</td></tr>
+            <tr style="background:#fef9c3"><td><code>add_deduction_fields_to_disbursements</code></td><td>Phase 4</td><td>deduction_type, deduction_amount, deduction_note</td><td>Advance / Vacancy / Other deductions on commission payouts</td></tr>
+            <tr style="background:#f0fdf4"><td><code>add_agent_tier</code></td><td>Future</td><td>agent_tier (Bronze/Silver/Gold)</td><td>Tier classification based on cumulative score</td></tr>
+            <tr style="background:#f0fdf4"><td><code>add_target_fields</code></td><td>Future</td><td>monthly_target, quarterly_target</td><td>Goal-based performance management</td></tr>
           </tbody>
         </table>
       </div>
 
       <div class="warn-banner">
-        <strong>Planned migrations</strong> (highlighted in green) are new additions for AGENT 360. They should be created as separate migration files, not modifications to existing migrations.
+        <strong>Phase 1–4 migrations</strong> (highlighted in yellow) are new additions for AGENT 360. They should be created as separate migration files, not modifications to existing migrations. <strong>Future</strong> items (green) are post-launch enhancements.
       </div>
     </section>
 
@@ -1856,6 +1875,132 @@
           </ul>
         </div>
 
+        <div class="feature-card" style="border-top:3px solid #f4a823">
+          <span class="feature-icon">🤝</span>
+          <h3>F09 — Sub-Agent (DO) Hierarchy <span style="font-size:10px;background:#fef3c7;color:#92400e;padding:2px 6px;border-radius:4px;font-weight:700">NEW</span></h3>
+          <p>Agents can now manage other agents directly as a Development Officer (DO).</p>
+          <ul>
+            <li>Link sub-agent to managing agent on create/edit</li>
+            <li>DO earns 0.2% commission per ticket sub-agent introduces</li>
+            <li>Employee managing agent earns 0.1%</li>
+            <li>Sub-Agents tab on agent show page</li>
+            <li>Auto-set <code>is_do = true</code> on parent agent</li>
+          </ul>
+        </div>
+
+        <div class="feature-card purple">
+          <span class="feature-icon">⚙️</span>
+          <h3>F10 — Cluster Commission Scheme <span style="font-size:10px;background:#f3e8ff;color:#6b21a8;padding:2px 6px;border-radius:4px;font-weight:700">NEW</span></h3>
+          <p>Configurable, cluster-specific commission eligibility rules replacing hardcoded values.</p>
+          <ul>
+            <li>Editable TDS % and GST % per cluster</li>
+            <li>Agent/Employee commission % configurable</li>
+            <li>High-value chit threshold & cap per cluster</li>
+            <li>Eligibility months per tenure & introducer type</li>
+            <li>Admin UI: Settings → Commission Schemes</li>
+          </ul>
+        </div>
+
+        <div class="feature-card green">
+          <span class="feature-icon">🏷️</span>
+          <h3>F11 — Common Coding System <span style="font-size:10px;background:#dcfce7;color:#14532d;padding:2px 6px;border-radius:4px;font-weight:700">NEW</span></h3>
+          <p>System-wide unique agent code independent of branch assignment.</p>
+          <ul>
+            <li>Auto-generated: <code>AGT00001</code> format</li>
+            <li>Unique across all branches and clusters</li>
+            <li>Searchable via Elasticsearch</li>
+            <li>Shown alongside branch-specific code</li>
+          </ul>
+        </div>
+
+        <div class="feature-card red">
+          <span class="feature-icon">✂️</span>
+          <h3>F12 — Commission Deductions <span style="font-size:10px;background:#fef2f2;color:#991b1b;padding:2px 6px;border-radius:4px;font-weight:700">NEW</span></h3>
+          <p>Record advance, vacancy, or other deductions against commission disbursements.</p>
+          <ul>
+            <li>Deduction type: Advance / Vacancy / Other</li>
+            <li>Deduction amount + free-text note</li>
+            <li>Final Disbursement = Gross − TDS − GST − Deductions</li>
+            <li>Shown in disbursement entry form</li>
+            <li>Reported in eligibility & disbursement reports</li>
+          </ul>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ── NEW: SUB-AGENT (DO) SECTION ────────────────── -->
+    <section class="section" id="subagent">
+      <div class="section-header">
+        <div class="section-icon">🤝</div>
+        <div>
+          <div class="section-num">Section 07B</div>
+          <h2>Sub-Agent (DO) Hierarchy</h2>
+        </div>
+      </div>
+
+      <div class="info-banner">
+        <strong>Priority 1 — Phase 1 implementation.</strong> Extends the existing Agent → Employee hierarchy with a new Agent → Agent relationship. An agent who manages other agents is classified as a <strong>Development Officer (DO)</strong>.
+      </div>
+
+      <div class="card-grid-2" style="margin-bottom:24px">
+        <div class="card">
+          <h3 style="font-size:14px;font-weight:800;color:var(--primary);margin-bottom:14px">Database Changes</h3>
+          <div class="table-wrap" style="margin:0">
+            <table>
+              <thead><tr><th>Column</th><th>Type</th><th>Description</th></tr></thead>
+              <tbody>
+                <tr><td><code>managing_agent_id</code></td><td><span class="badge-type badge-fk">FK</span></td><td>Self-referential FK → agents.id (nullable)</td></tr>
+                <tr><td><code>is_do</code></td><td><span class="badge-type badge-bool">bool</span></td><td>True when agent has ≥1 sub-agent. Auto-set on save.</td></tr>
+                <tr><td><code>common_code</code></td><td><span class="badge-type badge-str">str</span></td><td>Unique system-wide code, e.g. <code>AGT00001</code></td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+        <div class="card">
+          <h3 style="font-size:14px;font-weight:800;color:var(--primary);margin-bottom:14px">Model Relationships (Agent.php)</h3>
+          <div style="background:#1a2744;border-radius:8px;padding:16px;font-family:monospace;font-size:12px;color:#e2e8f0;line-height:2">
+            <span style="color:#93c5fd">public function</span> <span style="color:#f4a823">managingAgent</span>() {<br>
+            &nbsp;&nbsp;<span style="color:#93c5fd">return</span> $this-><span style="color:#6ee7b7">belongsTo</span>(Agent::class, <span style="color:#fca5a5">'managing_agent_id'</span>);<br>
+            }<br>
+            <span style="color:#93c5fd">public function</span> <span style="color:#f4a823">subAgents</span>() {<br>
+            &nbsp;&nbsp;<span style="color:#93c5fd">return</span> $this-><span style="color:#6ee7b7">hasMany</span>(Agent::class, <span style="color:#fca5a5">'managing_agent_id'</span>);<br>
+            }
+          </div>
+        </div>
+      </div>
+
+      <h3 style="font-size:15px;font-weight:800;color:var(--primary);margin-bottom:12px">DO Commission Rules</h3>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>DO Type</th><th>Earns From</th><th>Commission Rate</th><th>Trigger</th></tr></thead>
+          <tbody>
+            <tr>
+              <td><strong>Agent (DO)</strong></td>
+              <td>Each new ticket introduced by any of their sub-agents</td>
+              <td><strong style="color:#22c55e">0.2%</strong> of chit value</td>
+              <td>Every new enrollment by sub-agent</td>
+            </tr>
+            <tr>
+              <td><strong>Employee managing sub-agent</strong></td>
+              <td>Each new ticket introduced by the agent they manage</td>
+              <td><strong style="color:#3b6ef8">0.1%</strong> of chit value</td>
+              <td>Every new enrollment by their agent</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3 style="font-size:15px;font-weight:800;color:var(--primary);margin:20px 0 12px">UI Changes Required</h3>
+      <div class="card-grid-2">
+        <div class="card">
+          <h3 style="font-size:13px;font-weight:700;color:var(--primary);margin-bottom:10px">Agent Create / Edit Form</h3>
+          <p style="font-size:13px;color:var(--muted)">Add a <strong>Managing Agent</strong> searchable dropdown field, placed directly below the existing <em>Managing Employee</em> field. Field is optional. On save, sets <code>managing_agent_id</code>; parent agent's <code>is_do</code> is auto-set to <code>true</code>.</p>
+        </div>
+        <div class="card">
+          <h3 style="font-size:13px;font-weight:700;color:var(--primary);margin-bottom:10px">Agent Show Page — Sub-Agents Tab</h3>
+          <p style="font-size:13px;color:var(--muted)">New <strong>Sub-Agents</strong> tab on the agent show page. Lists all agents where <code>managing_agent_id = this agent</code>. Shows name, code, score, active enrollments count, and TBC for each sub-agent.</p>
+        </div>
       </div>
     </section>
 
@@ -3162,6 +3307,43 @@ Rural      → <span class="num">0.5</span> introductions
         </div>
       </div>
 
+      <!-- Cluster Rules -->
+      <div class="card" style="margin-top:16px;background:#fffbeb;border-color:#f59e0b">
+        <h3 style="font-size:14px;font-weight:800;color:#92400e;margin-bottom:14px">🆕 Cluster-Specific Eligibility Rules</h3>
+        <p style="font-size:13px;color:#78350f;margin-bottom:14px">These rules will be stored in <code>commission_schemes</code> + <code>commission_scheme_eligibility_rules</code> tables (Phase 3), replacing hardcoded values.</p>
+        <div class="table-wrap" style="margin:0">
+          <table>
+            <thead><tr><th>Cluster</th><th>Introducer</th><th>Tenure</th><th>Eligible After</th><th>High Value (&gt;50L)</th><th>Notes</th></tr></thead>
+            <tbody>
+              <tr><td><strong>Chennai</strong></td><td>Agent</td><td>20/25/30 months</td><td>2 months installments</td><td>4 months (no cap)</td><td>Groups after 1st auction only</td></tr>
+              <tr style="background:#fffbeb"><td><strong>Chennai</strong></td><td>Agent</td><td>40 months</td><td>2 months installments</td><td>4 months</td><td>Nil TBC required</td></tr>
+              <tr><td><strong>Chennai</strong></td><td>Employee</td><td>20/25/30 months</td><td>2 months installments</td><td>4 months</td><td></td></tr>
+              <tr style="background:#fffbeb"><td><strong>Chennai</strong></td><td>Employee</td><td>40 months</td><td>2 months installments</td><td>4 months</td><td></td></tr>
+              <tr><td><strong>Krishnagiri</strong></td><td>Agent</td><td>20/25/30 months</td><td>2 months installments</td><td>2 months (cap 25L)</td><td>All new tickets</td></tr>
+              <tr style="background:#fffbeb"><td><strong>Krishnagiri</strong></td><td>Agent</td><td>40 months</td><td>2 months installments</td><td>2 months (cap 25L)</td><td></td></tr>
+              <tr><td><strong>Krishnagiri</strong></td><td>Employee</td><td>20/25/30 months</td><td>2 months installments</td><td>2 months (cap 25L)</td><td></td></tr>
+              <tr style="background:#fffbeb"><td><strong>Krishnagiri</strong></td><td>Employee</td><td>40 months</td><td>2 months installments</td><td>2 months (cap 25L)</td><td></td></tr>
+              <tr><td><strong>Salem</strong></td><td>Agent</td><td>20/25/30 months</td><td>2 months installments</td><td>2 months (cap 25L)</td><td>All new tickets</td></tr>
+              <tr style="background:#fffbeb"><td><strong>Salem</strong></td><td>Agent</td><td>40 months</td><td><strong>3 months</strong> installments</td><td>2 months (cap 25L)</td><td></td></tr>
+              <tr><td><strong>Salem</strong></td><td>Employee</td><td>20/25/30 months</td><td><strong>3 months</strong> installments</td><td>2 months (cap 25L)</td><td></td></tr>
+              <tr style="background:#fffbeb"><td><strong>Salem</strong></td><td>Employee</td><td>40 months</td><td><strong>4 months</strong> installments</td><td>2 months (cap 25L)</td><td></td></tr>
+            </tbody>
+          </table>
+        </div>
+        <p style="font-size:12px;color:#78350f;margin-top:12px">All clusters: vacancy cutoff = 31st of month · Carry-forward if ticket given without cash · Nil TBC required for eligibility</p>
+      </div>
+
+      <div class="card" style="margin-top:16px;background:#fff1f2;border-color:#fca5a5">
+        <h3 style="font-size:14px;font-weight:800;color:#991b1b;margin-bottom:14px">🆕 Commission Deductions</h3>
+        <p style="font-size:13px;color:#7f1d1d;margin-bottom:12px">New deduction fields on <code>introducer_commission_disbursements</code> table (Phase 4).</p>
+        <div style="font-family:monospace;background:#1a2744;border-radius:8px;padding:14px;font-size:12px;color:#e2e8f0;line-height:1.8">
+          Final Disbursement = Gross Commission<br>
+          &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;− TDS<br>
+          &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;− GST<br>
+          &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;− Deductions (Advance / Vacancy / Other)
+        </div>
+      </div>
+
       <div class="card" style="margin-top:16px">
         <h3 style="font-size:14px;font-weight:800;color:var(--primary);margin-bottom:14px">Commission Methods (Introducer Trait)</h3>
         <div class="table-wrap" style="margin:0">
@@ -3189,103 +3371,116 @@ Rural      → <span class="num">0.5</span> introductions
       </div>
 
       <div class="info-banner">
-        The Agent module already has a strong foundation. AGENT 360 extends it with enhanced analytics, tier system, target management, and a richer mobile portal experience.
+        The Agent module already has a strong foundation. AGENT 360 extends it with the Sub-Agent (DO) hierarchy, Agent 360 Ledger view, configurable cluster commission schemes, commission deductions, and a full reporting suite.
       </div>
 
       <div class="roadmap">
 
         <div class="phase">
           <div class="phase-header">
-            <span class="phase-num">Phase 1 — Complete</span>
-            <h3>Core Agent CRUD</h3>
+            <span class="phase-num">Foundation — Complete</span>
+            <h3>Core Agent CRUD, Commission & API Portal</h3>
             <span class="phase-duration">Done ✅</span>
           </div>
           <div class="phase-card">
             <ul class="phase-tasks">
-              <li>✅ agents table + migrations</li>
-              <li>✅ Agent model + traits</li>
-              <li>✅ AgentsController (web)</li>
-              <li>✅ AgentPolicy (permissions)</li>
-              <li>✅ CRUD views (index, show, create, edit)</li>
-              <li>✅ Auto agent code generation</li>
-              <li>✅ Soft delete + restore</li>
-              <li>✅ Elasticsearch search indexing</li>
-            </ul>
-          </div>
-        </div>
-
-        <div class="phase">
-          <div class="phase-header">
-            <span class="phase-num">Phase 2 — Complete</span>
-            <h3>Commission & Scoring</h3>
-            <span class="phase-duration">Done ✅</span>
-          </div>
-          <div class="phase-card">
-            <ul class="phase-tasks">
-              <li>✅ Introduction tracking (morphMany)</li>
-              <li>✅ Commission allocation pipeline</li>
-              <li>✅ Commission disbursement + refund</li>
+              <li>✅ agents table + full migration history</li>
+              <li>✅ Agent model + Introducer trait</li>
+              <li>✅ AgentsController CRUD (web)</li>
+              <li>✅ Commission allocation, disbursement, refund</li>
               <li>✅ Performance scoring (0–5)</li>
-              <li>✅ UpdateAgentScoresJob</li>
-              <li>✅ Agent lock / unlock</li>
-              <li>✅ Agent merge</li>
+              <li>✅ Agent lock / merge / restore</li>
               <li>✅ Audit trail + change logs</li>
-            </ul>
-          </div>
-        </div>
-
-        <div class="phase">
-          <div class="phase-header">
-            <span class="phase-num">Phase 3 — Complete</span>
-            <h3>Mobile API Portal</h3>
-            <span class="phase-duration">Done ✅</span>
-          </div>
-          <div class="phase-card">
-            <ul class="phase-tasks">
-              <li>✅ API V2 agent authentication</li>
-              <li>✅ my_account_details endpoint</li>
-              <li>✅ my_enrollments endpoint</li>
-              <li>✅ AgentResource transformer</li>
-              <li>✅ Pagination, search, filter, sort</li>
-              <li>✅ JWT auth + person_type routing</li>
+              <li>✅ API V2 agent portal (JWT auth)</li>
+              <li>✅ Elasticsearch indexing</li>
             </ul>
           </div>
         </div>
 
         <div class="phase current">
           <div class="phase-header">
-            <span class="phase-num" style="background:#fef3c7;color:#92400e">Phase 4 — Planned</span>
-            <h3>AGENT 360 Dashboard & Analytics</h3>
+            <span class="phase-num" style="background:#fef3c7;color:#92400e">Phase 1 — In Progress (Priority 1)</span>
+            <h3>Sub-Agent (DO) Hierarchy</h3>
             <span class="phase-duration">Next Sprint</span>
           </div>
           <div class="phase-card">
             <ul class="phase-tasks">
-              <li>🔲 Agent Tier classification (Bronze/Silver/Gold/Elite)</li>
-              <li>🔲 Monthly & quarterly introduction targets</li>
-              <li>🔲 Branch-level agent leaderboard</li>
-              <li>🔲 Commission trend charts (monthly)</li>
-              <li>🔲 Introduction funnel analytics</li>
-              <li>🔲 Agent comparison report (multi-agent)</li>
-              <li>🔲 Export: Agent performance PDF</li>
-              <li>🔲 KPI dashboard cards in 360 view</li>
+              <li>🔲 Migration: add <code>managing_agent_id</code>, <code>is_do</code>, <code>common_code</code></li>
+              <li>🔲 Agent model: <code>managingAgent()</code>, <code>subAgents()</code> relationships</li>
+              <li>🔲 Agent create/edit form: Managing Agent dropdown</li>
+              <li>🔲 Agent show page: Sub-Agents tab</li>
+              <li>🔲 DO commission: 0.2% (agent DO) / 0.1% (employee managing)</li>
+              <li>🔲 Auto-set <code>is_do = true</code> on parent when sub-agent is saved</li>
+              <li>🔲 Common code auto-generation (AGT00001)</li>
+              <li>🔲 Merge: transfer <code>managing_agent_id</code> references</li>
             </ul>
           </div>
         </div>
 
         <div class="phase">
           <div class="phase-header">
-            <span class="phase-num">Phase 5 — Future</span>
-            <h3>Agent Self-Service & Notifications</h3>
-            <span class="phase-duration">Q3 2026</span>
+            <span class="phase-num">Phase 2 — Planned</span>
+            <h3>Agent 360 Ledger View</h3>
+            <span class="phase-duration">Sprint 2</span>
           </div>
           <div class="phase-card">
             <ul class="phase-tasks">
-              <li>🔲 Push notifications on commission updates</li>
-              <li>🔲 Agent can request document updates via portal</li>
-              <li>🔲 Monthly commission statement (PDF download)</li>
-              <li>🔲 Referral tracking (agent referring other agents)</li>
-              <li>🔲 Agent training module completion tracking</li>
-              <li>🔲 WhatsApp notification on disbursement</li>
+              <li>🔲 Updated summary stats bar (Prized, Non Prized, TBC &gt;60d, FL)</li>
+              <li>🔲 Own Tkt / Guarantor breakdown in stats bar</li>
+              <li>🔲 Enrollment Details (Ledger) tab with Prized Status + Avg Days (Coll)</li>
+              <li>🔲 Guarantor Details tab with Guarantor Score + Avg Payment Days</li>
+              <li>🔲 Sub-Agents tab (from Phase 1)</li>
+              <li>🔲 Sticky header on all tabs</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="phase">
+          <div class="phase-header">
+            <span class="phase-num">Phase 3 — Planned</span>
+            <h3>Cluster Commission Scheme Config</h3>
+            <span class="phase-duration">Sprint 3</span>
+          </div>
+          <div class="phase-card">
+            <ul class="phase-tasks">
+              <li>🔲 Migrations: <code>commission_schemes</code> + <code>commission_scheme_eligibility_rules</code></li>
+              <li>🔲 Seed default rules: Chennai / Krishnagiri / Salem</li>
+              <li>🔲 Admin UI: Settings → Commission Schemes (editable table)</li>
+              <li>🔲 Refactor Introducer.php eligibility logic to read from DB</li>
+              <li>🔲 Editable TDS %, GST %, commission %, high-value threshold</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="phase">
+          <div class="phase-header">
+            <span class="phase-num">Phase 4 — Planned</span>
+            <h3>Commission Deductions & Disbursement Entry</h3>
+            <span class="phase-duration">Sprint 4</span>
+          </div>
+          <div class="phase-card">
+            <ul class="phase-tasks">
+              <li>🔲 Migration: add <code>deduction_type</code>, <code>deduction_amount</code>, <code>deduction_note</code></li>
+              <li>🔲 Disbursement entry form: deduction type + amount fields</li>
+              <li>🔲 Commission calculation: Gross − TDS − GST − Deductions</li>
+              <li>🔲 Reports updated to show gross vs net</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="phase">
+          <div class="phase-header">
+            <span class="phase-num">Phase 5 — Planned</span>
+            <h3>Reports & Filters</h3>
+            <span class="phase-duration">Sprint 5</span>
+          </div>
+          <div class="phase-card">
+            <ul class="phase-tasks">
+              <li>🔲 Eligibility List Report (Agent/PAN/Subscriber/Enrollment/1st Auction/Chit Value)</li>
+              <li>🔲 Disbursement List Report</li>
+              <li>🔲 Group-wise Commission Analysis Report</li>
+              <li>🔲 Month-wise / Staff-wise / Cluster-wise report filters</li>
+              <li>🔲 Ledger filters: Cluster, Branch, Group, Chit Value, Tenure, Policy, Date ranges</li>
             </ul>
           </div>
         </div>
